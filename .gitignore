@@ -43,3 +43,5 @@ CTestTestfile.cmake
 bin/
 lib/
 
+.idea
+*.cbp
