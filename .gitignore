@@ -45,3 +45,6 @@ lib/
 
 .idea
 *.cbp
+
+*-download
+googletest-src/
