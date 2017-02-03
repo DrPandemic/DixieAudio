@@ -27,9 +27,9 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 
 # Trivial example using gtest and gmock
-add_executable(all_tests test/main_test.cpp)
-target_link_libraries(all_tests gtest)
-add_test(NAME all_tests COMMAND all_tests)
-add_custom_command(TARGET all_tests 
+add_executable(tests test/main_test.cpp)
+target_link_libraries(tests gtest)
+add_test(NAME tests COMMAND tests)
+add_custom_command(TARGET tests 
 					POST_BUILD 
-					COMMAND ./bin/all_tests)
+					COMMAND ./bin/tests)
