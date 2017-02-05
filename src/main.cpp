@@ -1,6 +1,7 @@
 #include <iostream>
 #include <pulse/error.h>
 #include <pulse/simple.h>
+#include <cstdlib>
 
 using namespace std;
 
@@ -20,6 +21,20 @@ int main() {
                     NULL,    // Use default buffering attributes.
                     NULL     // Ignore error code.
                     );
-  cout << "HELLO JS" << endl;
-  cout << "HELLO JS" << endl;
+
+    while(true) {
+        unsigned int superSong[200];
+
+        for (int j = 0; j < 200; j++) {
+
+            int i = rand() % 1000;
+            superSong[j] = i;
+        }
+
+        int errorCode;
+        pa_simple_write(s, superSong, 200, &errorCode);
+
+        cout << "HELLO JS" << endl;
+        cout << "HELLO JS" << endl;
+    }
 }
