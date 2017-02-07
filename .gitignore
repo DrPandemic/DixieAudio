@@ -48,3 +48,5 @@ lib/
 
 *-download
 googletest-src/
+
+.clang_complete
