@@ -1,7 +1,3 @@
-//
-// Created by bugz on 07/02/17.
-//
-
 #ifndef DIXIEAUDIO_PULSEAUDIO_DEVICE_H
 #define DIXIEAUDIO_PULSEAUDIO_DEVICE_H
 

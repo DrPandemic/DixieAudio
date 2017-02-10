@@ -11,4 +11,4 @@ vector<audio_data> NSF_file::read(size_t nb_bytes) {
   return v;
 }
 
-NSF_header NSF_file::getHeader() const { return header; }
+const NSF_header &NSF_file::getHeader() const { return header; }

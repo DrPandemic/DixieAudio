@@ -48,7 +48,7 @@ private:
 
 public:
   std::vector<audio_data> read(size_t nb_bytes) override;
-  NSF_header getHeader() const override;
+  const NSF_header &getHeader() const override;
 };
 
 #endif // DIXIEAUDIO_NSF_FILE_H
