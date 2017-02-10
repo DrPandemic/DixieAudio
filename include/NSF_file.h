@@ -1,8 +1,8 @@
 //
 // Created by bugz on 07/02/17.
 //
-#ifndef DIKIEAUDIO_NSF_FILE_H
-#define DIKIEAUDIO_NSF_FILE_H
+#ifndef DIXIEAUDIO_NSF_FILE_H
+#define DIXIEAUDIO_NSF_FILE_H
 
 #import "./audio_file.h"
 #import <istream>
@@ -44,13 +44,11 @@ struct NSF_header : public audio_header {
 
 class NSF_file : public audio_file {
 private:
-  std::istream file_stream;
   NSF_header header;
 
 public:
-  NSF_file(std::istream &file_stream);
   std::vector<audio_data> read(size_t nb_bytes) override;
   NSF_header getHeader() const override;
 };
 
-#endif // DIKIEAUDIO_NSF_FILE_H
+#endif // DIXIEAUDIO_NSF_FILE_H
