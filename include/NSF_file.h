@@ -4,11 +4,9 @@
 #ifndef DIKIEAUDIO_NSF_FILE_H
 #define DIKIEAUDIO_NSF_FILE_H
 
-#import "audio_file.h"
+#import "./audio_file.h"
 #import <istream>
 #import <vector>
-
-using audio_data = char;
 
 enum NSF_type { PAL, NTSC, DUAL };
 
@@ -25,16 +23,17 @@ enum chip_support {
 
 struct NSF_header : public audio_header {
   using address = unsigned int;
-  string format_file;
+
+  std::string format_file;
   unsigned int version_number;
   size_t total_songs;
   unsigned int starting_song;
   address load_address;
   address init_address;
   address play_address;
-  string song_name;
-  string artist_name;
-  string copyright_holder;
+  std::string song_name;
+  std::string artist_name;
+  std::string copyright_holder;
   unsigned int NTSC_speed;
   unsigned int bankswitch_init_values;
   unsigned int PAL_speed;
@@ -49,8 +48,8 @@ private:
   NSF_header header;
 
 public:
-  NSF_file(std::istream &file_stream) override;
-  vector<audio_data> read(size_t nb_bytes) override;
+  NSF_file(std::istream &file_stream);
+  std::vector<audio_data> read(size_t nb_bytes) override;
   NSF_header getHeader() const override;
 };
 
