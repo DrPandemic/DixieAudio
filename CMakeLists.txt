@@ -27,12 +27,11 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 
 
 # Trivial example using gtest and gmock
+enable_testing()
+SET(env{GTEST_COLOR} TRUE)
 add_executable(tests test/main_test.cpp)
 target_link_libraries(tests gtest)
 add_test(NAME tests COMMAND tests)
-add_custom_command(TARGET tests
-					POST_BUILD
-					COMMAND ./bin/tests)
 
 include(LibFindMacros.cmake)
 
