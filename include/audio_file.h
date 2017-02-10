@@ -13,9 +13,10 @@ protected:
   std::istream &file_stream;
 
 public:
-  audio_file(std::istream &file_stream);
-  virtual std::vector<audio_data> read(size_t nb_bytes);
-  virtual const audio_header &getHeader() const;
+  audio_file(std::istream &file_stream) : file_stream{file_stream} {};
+  virtual std::vector<audio_data> read(size_t nb_bytes) = 0;
+  virtual const audio_header &getHeader() const = 0;
+  virtual ~audio_file(){};
 };
 
 #endif // DIXIEAUDIO_AUDIO_FILE_H
