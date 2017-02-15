@@ -7,7 +7,7 @@
 using namespace std;
 
 NSF_header::NSF_header(std::istream &file_stream) {
-  using ii = std::istream_iterator<char>;
+  using ii = std::istream_iterator<unsigned char>;
 
   std::copy_n(ii(file_stream), 5, back_inserter(format_file));
   std::copy_n(ii(file_stream), 1, &version_number);

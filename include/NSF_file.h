@@ -11,6 +11,7 @@
 enum NSF_type { PAL, NTSC, DUAL };
 
 enum chip_support {
+  NONE = 0,
   VRCVI = 1 << 0,
   VCRVII = 1 << 1,
   FDS = 1 << 2,
@@ -46,9 +47,9 @@ struct NSF_header : public audio_header {
   std::string song_name;
   std::string artist_name;
   std::string copyright_holder;
-  quantity NTSC_speed;
+  speed NTSC_speed;
   quantity bankswitch_init_values;
-  quantity PAL_speed;
+  speed PAL_speed;
   NSF_type type;
   quantity extra_chip_support;
   quantity expansion_bits;

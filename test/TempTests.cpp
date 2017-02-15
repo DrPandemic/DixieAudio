@@ -1,6 +1,3 @@
-//
-// Created by bugz on 10/02/17.
-//
 #include "gtest/gtest.h"
 
 TEST(basic_test, basic_test_int) {
@@ -20,3 +17,4 @@ TEST(basic_test, basic_test_int_fail) {
   EXPECT_EQ(j, 3);
   EXPECT_EQ(i, j);
 }
+//
