@@ -50,3 +50,5 @@ lib/
 googletest-src/
 
 .clang_complete
+
+*.nsf
