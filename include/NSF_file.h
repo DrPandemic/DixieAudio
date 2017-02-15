@@ -47,6 +47,7 @@ private:
   NSF_header header;
 
 public:
+  NSF_file(std::istream &file_stream);
   std::vector<audio_data> read(size_t nb_bytes) override;
   const NSF_header &getHeader() const override;
   ~NSF_file() override;

@@ -3,6 +3,8 @@
 
 using namespace std;
 
+NSF_file::NSF_file(std::istream &file_stream) : audio_file(file_stream) {}
+
 NSF_file::~NSF_file() {}
 
 vector<audio_data> NSF_file::read(size_t nb_bytes) {
