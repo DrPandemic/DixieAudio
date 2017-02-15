@@ -7,11 +7,10 @@
 using namespace std;
 
 NSF_header::NSF_header(std::istream &file_stream) {
-  std::copy_n(std::istream_iterator<char>(file_stream), 5,
-              back_inserter(format_file));
+  using ii = std::istream_iterator<char>;
 
-  char v_tmp;
-  std::copy_n(std::istream_iterator<char>(file_stream), 1, &v_tmp);
+  std::copy_n(ii(file_stream), 5, back_inserter(format_file));
+  std::copy_n(ii(file_stream), 1, &version_number);
 }
 
 NSF_file::NSF_file(std::istream &file_stream)

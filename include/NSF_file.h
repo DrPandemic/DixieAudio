@@ -37,8 +37,8 @@ struct NSF_header : public audio_header {
   using quantity = unsigned int;
 
   std::string format_file;
-  unsigned int version_number;
-  size_t total_songs;
+  quantity version_number;
+  quantity total_songs;
   quantity starting_song;
   address load_address;
   address init_address;
