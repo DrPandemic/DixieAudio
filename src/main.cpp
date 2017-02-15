@@ -8,5 +8,5 @@ int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in);
   NSF_file f(s);
 
-  cout << f.getHeader().format_file;
+  cout << "format " << f.getHeader().format_file;
 }

@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 project (DixieAudio)
-set(clang++ "${CMAKE_CXX_FLAGS} -std=c++17")
+set(clang++ "${CMAKE_CXX_FLAGS} -std=c++1z")
 
 set(CMAKE_CXX_STANDARD 11) # C++11...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...

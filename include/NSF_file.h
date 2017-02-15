@@ -23,23 +23,26 @@ enum chip_support {
 
 struct NSF_header : public audio_header {
   using address = unsigned int;
+  using quantity = unsigned int;
 
   std::string format_file;
   unsigned int version_number;
   size_t total_songs;
-  unsigned int starting_song;
+  quantity starting_song;
   address load_address;
   address init_address;
   address play_address;
   std::string song_name;
   std::string artist_name;
   std::string copyright_holder;
-  unsigned int NTSC_speed;
-  unsigned int bankswitch_init_values;
-  unsigned int PAL_speed;
+  quantity NTSC_speed;
+  quantity bankswitch_init_values;
+  quantity PAL_speed;
   NSF_type type;
-  unsigned int extra_chip_support;
-  unsigned expansion_bits;
+  quantity extra_chip_support;
+  quantity expansion_bits;
+
+  NSF_header(std::istream &file_stream);
 };
 
 class NSF_file : public audio_file {
