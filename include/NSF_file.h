@@ -21,8 +21,19 @@ enum chip_support {
   expansion_2 = 1 << 7
 };
 
-struct NSF_header : public audio_header {
+struct nsf_word {
   using address = unsigned int;
+
+  address low;
+  address high;
+
+  nsf_word(address low, address high) : low{low}, high{high} {}
+  nsf_word(){};
+};
+
+struct NSF_header : public audio_header {
+  using address = nsf_word;
+  using speed = nsf_word;
   using quantity = unsigned int;
 
   std::string format_file;
