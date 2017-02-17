@@ -8,6 +8,7 @@
 enum NSF_type { PAL, NTSC, DUAL };
 
 enum chip_support {
+  NONE = 0,
   VRCVI = 1 << 0,
   VCRVII = 1 << 1,
   FDS = 1 << 2,

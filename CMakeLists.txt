@@ -10,9 +10,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(dixieaudio_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(dixieaudio_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+
 file(GLOB DIXIEAUDIO_SOURCE
 	src/*.cpp
 	include/*.h
+    application/main.cpp
 )
 
 add_subdirectory(test)
