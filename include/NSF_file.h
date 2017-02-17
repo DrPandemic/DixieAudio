@@ -5,7 +5,7 @@
 #import <istream>
 #import <vector>
 
-enum NSF_type { PAL, NTSC, DUAL };
+enum NSF_type { NTSC = 0, PAL = 1, DUAL = 2 };
 
 enum chip_support {
   NONE = 0,
@@ -20,19 +20,20 @@ enum chip_support {
 };
 
 struct NSF_word {
-  using address = unsigned int;
+  using type = unsigned int;
 
-  address low;
-  address high;
+  type low;
+  type high;
 
-  NSF_word(address low, address high) : low{low}, high{high} {}
+  NSF_word(type low, type high) : low{low}, high{high} {}
   NSF_word(){};
 };
 
 struct NSF_header : public audio_header {
   using address = NSF_word;
   using speed = NSF_word;
-  using quantity = unsigned int;
+  using quantity = NSF_word::type;
+  using flags = quantity;
 
   std::string format_file;
   quantity version_number;
@@ -45,11 +46,11 @@ struct NSF_header : public audio_header {
   std::string artist_name;
   std::string copyright_holder;
   speed NTSC_speed;
-  quantity bankswitch_init_values;
+  quantity bankswitch_init_values[8];
   speed PAL_speed;
-  NSF_type type;
-  quantity extra_chip_support;
-  quantity expansion_bits;
+  NSF_type NSF_type;
+  flags extra_chip_support;
+  quantity expansion_bits[4];
 
   NSF_header(std::istream &file_stream);
 };

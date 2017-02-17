@@ -21,10 +21,30 @@ NSF_header::NSF_header(istream &file_stream) {
   copy_n(ii(file_stream), 1, &play_address.low);
   copy_n(ii(file_stream), 1, &play_address.high);
   copy_n(ii(file_stream), 32, back_inserter(song_name));
+  song_name = string{song_name.c_str()};
   copy_n(ii(file_stream), 32, back_inserter(artist_name));
+  artist_name = string{artist_name.c_str()};
   copy_n(ii(file_stream), 32, back_inserter(copyright_holder));
+  copyright_holder = string{copyright_holder.c_str()};
   copy_n(ii(file_stream), 1, &NTSC_speed.low);
   copy_n(ii(file_stream), 1, &NTSC_speed.high);
+  for (int i = 0; i < 8; ++i)
+    copy_n(ii(file_stream), 1, &bankswitch_init_values[i]);
+  copy_n(ii(file_stream), 1, &PAL_speed.low);
+  copy_n(ii(file_stream), 1, &PAL_speed.high);
+
+  int tmp;
+  copy_n(ii(file_stream), 1, &tmp);
+  if (tmp == NSF_type::NTSC)
+    NSF_type = NSF_type::NTSC;
+  else if (tmp == NSF_type::PAL)
+    NSF_type = NSF_type::PAL;
+  else
+    NSF_type = NSF_type::DUAL;
+
+  copy_n(ii(file_stream), 1, &extra_chip_support);
+  for (int i = 0; i < 4; ++i)
+    copy_n(ii(file_stream), 1, &expansion_bits[i]);
 }
 
 NSF_file::NSF_file(std::istream &file_stream)
@@ -56,9 +76,11 @@ std::ostream &operator<<(std::ostream &os, const NSF_header &h) {
   os << "Artist: " << h.artist_name << std::endl;
   os << "Copyright: " << h.copyright_holder << std::endl;
   os << "NTSC speed: " << h.NTSC_speed << std::endl;
-  os << "bankswitch init value: " << h.bankswitch_init_values << std::endl;
+  os << "bankswitch init value: " << std::endl;
+  for (int i = 0; i < 8; ++i)
+    os << "  " << h.bankswitch_init_values[i] << std::endl;
   os << "PAL speed: " << h.PAL_speed << std::endl;
-  os << "Type: " << h.type << std::endl;
+  os << "Type: " << h.NSF_type << std::endl;
   os << "Extra chip shupport: " << h.extra_chip_support << std::endl;
   os << "Expension bits: " << h.expansion_bits << std::endl;
 

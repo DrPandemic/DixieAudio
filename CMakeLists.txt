@@ -16,7 +16,7 @@ set(dixieaudio_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 file(GLOB DIXIEAUDIO_SOURCE
 	src/*.cpp
 	include/*.h
-    application/main.cpp
+  application/main.cpp
 )
 
 add_subdirectory(test)
