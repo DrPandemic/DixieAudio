@@ -1,6 +1,3 @@
-//
-// Created by bugz on 07/02/17.
-//
 #ifndef DIXIEAUDIO_NSF_FILE_H
 #define DIXIEAUDIO_NSF_FILE_H
 
@@ -21,19 +18,19 @@ enum chip_support {
   expansion_2 = 1 << 7
 };
 
-struct nsf_word {
+struct NSF_word {
   using address = unsigned int;
 
   address low;
   address high;
 
-  nsf_word(address low, address high) : low{low}, high{high} {}
-  nsf_word(){};
+  NSF_word(address low, address high) : low{low}, high{high} {}
+  NSF_word(){};
 };
 
 struct NSF_header : public audio_header {
-  using address = nsf_word;
-  using speed = nsf_word;
+  using address = NSF_word;
+  using speed = NSF_word;
   using quantity = unsigned int;
 
   std::string format_file;
@@ -46,9 +43,9 @@ struct NSF_header : public audio_header {
   std::string song_name;
   std::string artist_name;
   std::string copyright_holder;
-  quantity NTSC_speed;
+  speed NTSC_speed;
   quantity bankswitch_init_values;
-  quantity PAL_speed;
+  speed PAL_speed;
   NSF_type type;
   quantity extra_chip_support;
   quantity expansion_bits;
@@ -66,5 +63,11 @@ public:
   const NSF_header &getHeader() const override;
   ~NSF_file() override;
 };
+
+std::ostream &operator<<(std::ostream &, const NSF_word &);
+
+std::ostream &operator<<(std::ostream &, const NSF_header &);
+
+std::ostream &operator<<(std::ostream &, const NSF_file &);
 
 #endif // DIXIEAUDIO_NSF_FILE_H
