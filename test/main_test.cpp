@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 
-#include "TempTests.cpp"
 #include "NSFHeaderTests.cpp"
 
 int main(int argc, char **argv) {

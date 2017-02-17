@@ -29,8 +29,11 @@ NSF_header::NSF_header(istream &file_stream) {
   copy_n(ii(file_stream), 1, &NTSC_speed.low);
   copy_n(ii(file_stream), 1, &NTSC_speed.high);
   bankswitch_init_values.reserve(8);
-  for (int i = 0; i < 8; ++i)
-    copy_n(ii(file_stream), 1, &bankswitch_init_values[i]);
+  for (int i = 0; i < 8; ++i) {
+    NSF_header::quantity tmp;
+    copy_n(ii(file_stream), 1, &tmp);
+    bankswitch_init_values.push_back(tmp);
+  }
   copy_n(ii(file_stream), 1, &PAL_speed.low);
   copy_n(ii(file_stream), 1, &PAL_speed.high);
 
@@ -45,8 +48,11 @@ NSF_header::NSF_header(istream &file_stream) {
 
   copy_n(ii(file_stream), 1, &extra_chip_support);
   expansion_bits.reserve(4);
-  for (int i = 0; i < 4; ++i)
-    copy_n(ii(file_stream), 1, &expansion_bits[i]);
+  for (int i = 0; i < 4; ++i) {
+    NSF_header::quantity tmp;
+    copy_n(ii(file_stream), 1, &tmp);
+    expansion_bits.push_back(tmp);
+  }
 }
 
 NSF_file::NSF_file(std::istream &file_stream)
