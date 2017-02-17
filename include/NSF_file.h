@@ -20,19 +20,19 @@ enum chip_support {
 };
 
 struct NSF_word {
-  using type = unsigned int;
+  using half_word = unsigned int;
 
-  type low;
-  type high;
+  half_word low;
+  half_word high;
 
-  NSF_word(type low, type high) : low{low}, high{high} {}
+  NSF_word(half_word low, half_word high) : low{low}, high{high} {}
   NSF_word(){};
 };
 
 struct NSF_header : public audio_header {
   using address = NSF_word;
   using speed = NSF_word;
-  using quantity = NSF_word::type;
+  using quantity = NSF_word::half_word;
   using flags = quantity;
 
   std::string format_file;

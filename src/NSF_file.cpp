@@ -63,7 +63,7 @@ const NSF_header &NSF_file::getHeader() const { return header; }
 
 std::ostream &operator<<(std::ostream &os, const NSF_word &w) {
   os << std::endl << "  Low: " << w.low << std::endl;
-  return os << "  High: " << w.low;
+  return os << "  High: " << w.high;
 }
 
 std::ostream &operator<<(std::ostream &os, const NSF_header &h) {
