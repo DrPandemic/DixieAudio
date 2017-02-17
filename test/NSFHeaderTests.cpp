@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
+#include <vector>
 
 TEST(reader_test, reader_test_NSFHeader) {
 
@@ -26,6 +27,10 @@ TEST(reader_test, reader_test_NSFHeader) {
   NSF_file marioNSF(ss);
   NSF_header marioHeader = marioNSF.getHeader();
 
+  std::vector<NSF_header::quantity> bankswitch_init_values(8,0);
+  std::vector<NSF_header::quantity> expansion_bits(4,0);
+
+
   EXPECT_EQ(marioHeader.format_file, "NESM\x1A");
   EXPECT_EQ(marioHeader.version_number, 1);
   EXPECT_EQ(marioHeader.total_songs, 18);
@@ -36,15 +41,15 @@ TEST(reader_test, reader_test_NSFHeader) {
   EXPECT_EQ(marioHeader.init_address.high, 0xBE);
   EXPECT_EQ(marioHeader.play_address.low, 0xD0);
   EXPECT_EQ(marioHeader.play_address.high, 0xF2);
-  EXPECT_EQ(marioHeader.song_name, "Super Mario Bros");
+  EXPECT_EQ(marioHeader.song_name, "Super Mario Bros.");
   EXPECT_EQ(marioHeader.artist_name, "Koji Kondo");
   EXPECT_EQ(marioHeader.copyright_holder, "1985 Nintendo");
   EXPECT_EQ(marioHeader.NTSC_speed.low, 0x1A);
   EXPECT_EQ(marioHeader.NTSC_speed.high, 0x41);
-  EXPECT_EQ(marioHeader.bankswitch_init_values, 0);
+  EXPECT_EQ(marioHeader.bankswitch_init_values,  bankswitch_init_values);
   EXPECT_EQ(marioHeader.PAL_speed.low, 0);
   EXPECT_EQ(marioHeader.PAL_speed.high, 0);
-  EXPECT_EQ(marioHeader.type, 0);
+  EXPECT_EQ(marioHeader.NSF_type, 0);
   EXPECT_EQ(marioHeader.extra_chip_support, NSF_type::NTSC);
-  EXPECT_EQ(marioHeader.expansion_bits, 0);
+  EXPECT_EQ(marioHeader.expansion_bits, expansion_bits);
 }
