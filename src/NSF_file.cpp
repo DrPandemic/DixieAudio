@@ -82,7 +82,9 @@ std::ostream &operator<<(std::ostream &os, const NSF_header &h) {
   os << "PAL speed: " << h.PAL_speed << std::endl;
   os << "Type: " << h.NSF_type << std::endl;
   os << "Extra chip shupport: " << h.extra_chip_support << std::endl;
-  os << "Expension bits: " << h.expansion_bits << std::endl;
+  os << "Expension bits: " << std::endl;
+  for (int i = 0; i < 4; ++i)
+    os << "  " << h.expansion_bits[i] << std::endl;
 
   return os;
 }
