@@ -28,6 +28,7 @@ NSF_header::NSF_header(istream &file_stream) {
   copyright_holder = string{copyright_holder.c_str()};
   copy_n(ii(file_stream), 1, &NTSC_speed.low);
   copy_n(ii(file_stream), 1, &NTSC_speed.high);
+  bankswitch_init_values.reserve(8);
   for (int i = 0; i < 8; ++i)
     copy_n(ii(file_stream), 1, &bankswitch_init_values[i]);
   copy_n(ii(file_stream), 1, &PAL_speed.low);
@@ -43,6 +44,7 @@ NSF_header::NSF_header(istream &file_stream) {
     NSF_type = NSF_type::DUAL;
 
   copy_n(ii(file_stream), 1, &extra_chip_support);
+  expansion_bits.reserve(4);
   for (int i = 0; i < 4; ++i)
     copy_n(ii(file_stream), 1, &expansion_bits[i]);
 }

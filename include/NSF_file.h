@@ -46,11 +46,11 @@ struct NSF_header : public audio_header {
   std::string artist_name;
   std::string copyright_holder;
   speed NTSC_speed;
-  quantity bankswitch_init_values[8];
+  std::vector<quantity> bankswitch_init_values;
   speed PAL_speed;
   NSF_type NSF_type;
   flags extra_chip_support;
-  quantity expansion_bits[4];
+  std::vector<quantity> expansion_bits;
 
   NSF_header(std::istream &file_stream);
 };
