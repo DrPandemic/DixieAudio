@@ -25,7 +25,7 @@ TEST(reader_test, reader_test_NSFHeader) {
   ss.write(reinterpret_cast<char const *>(data), sizeof data);
 
   NSFFile marioNSF(ss);
-  NSFHeader marioHeader = marioNSF.getHeader();
+  NSFHeader marioHeader = marioNSF.get_header();
 
   std::vector<NSFHeader::quantity> bankswitch_init_values(8, 0);
   std::vector<NSFHeader::quantity> expansion_bits(4, 0);
