@@ -1,13 +1,14 @@
 #include "../include/PulseaudioDevice.h"
+#include <iostream>
 
 using namespace std;
 PulseaudioDevice::PulseaudioDevice(const AudioHeader &header)
     : AudioDevice(header) {
 
   pa_sample_spec ss;
-  ss.format = PA_SAMPLE_S16NE;//PA_SAMPLE_U8;
+  ss.format = PA_SAMPLE_U8;
   ss.channels = 1;
-  ss.rate = 44100;//header.get_rate();
+  ss.rate = header.get_rate();
 
   device = pa_simple_new(nullptr,      // Use the default server.
                          "DixieAudio", // Our application's name.
@@ -23,13 +24,5 @@ PulseaudioDevice::PulseaudioDevice(const AudioHeader &header)
 PulseaudioDevice::~PulseaudioDevice() { pa_simple_free(device); }
 
 int PulseaudioDevice::write(const std::vector<AudioData> data) {
-
-  //  int pa_simple_write	(	pa_simple * 	s,
-  //                          const void * 	data,
-  //                          size_t 	bytes,
-  //                          int * 	error
-  // )
-
-  return pa_simple_write(device, static_cast<const void *>(&data), data.size(),
-                         nullptr);
+  return pa_simple_write(device, &data[0], 200, nullptr);
 }
