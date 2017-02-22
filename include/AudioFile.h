@@ -7,8 +7,9 @@
 using AudioData = char;
 
 struct AudioHeader {
-  virtual unsigned int get_rate();
-  virtual ~AudioHeader();
+  virtual unsigned int get_rate() const = 0;
+  virtual ~AudioHeader(){};
+  AudioHeader(){};
 };
 
 class AudioFile {

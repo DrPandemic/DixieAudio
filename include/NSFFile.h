@@ -29,7 +29,7 @@ struct NSFWord {
   NSFWord(half_word low, half_word high) : low{low}, high{high} {}
   NSFWord(){};
 
-  value_type get_value() { return (high << 8) + low; }
+  value_type get_value() const { return (high << 8) + low; }
 };
 
 struct NSFHeader : public AudioHeader {
@@ -58,7 +58,7 @@ struct NSFHeader : public AudioHeader {
   NSFHeader(std::istream &file_stream);
   ~NSFHeader() override;
 
-  unsigned int get_rate() override;
+  unsigned int get_rate() const override;
 };
 
 class NSFFile : public AudioFile {

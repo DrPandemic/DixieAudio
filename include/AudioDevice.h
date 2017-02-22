@@ -5,11 +5,8 @@
 #include <vector>
 
 class AudioDevice {
-protected:
-  AudioHeader header;
-
 public:
-  AudioDevice(AudioHeader header) : header{header} {};
+  AudioDevice(const AudioHeader &){};
   virtual ~AudioDevice(){};
   virtual int write(std::vector<AudioData> data) = 0;
 };
