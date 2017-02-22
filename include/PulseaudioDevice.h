@@ -8,10 +8,10 @@
 
 class PulseaudioDevice : public AudioDevice {
 public:
-  PulseaudioDevice(audio_header header);
+  PulseaudioDevice(AudioHeader header);
   ~PulseaudioDevice() override;
 
-  int write(std::vector<audio_data> data) override;
+  int write(std::vector<AudioData> data) override;
 
 private:
   pa_simple *device;

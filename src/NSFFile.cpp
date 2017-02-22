@@ -6,7 +6,7 @@
 
 using namespace std;
 
-NSFHeader::NSFHeader(istream &file_stream) {
+NSFHeader::NSFHeader(istream &file_stream): AudioHeader() {
   file_stream >> std::noskipws;
   using ii = istream_iterator<uint8_t>;
 
@@ -55,13 +55,23 @@ NSFHeader::NSFHeader(istream &file_stream) {
   }
 }
 
+unsigned int NSFHeader::get_rate() {
+  if (NSF_type == NSFType::PAL) {
+    return PAL_speed.get_value();
+  } else {
+    return NTSC_speed.get_value();
+  }
+}
+
+NSFHeader::~NSFHeader() {}
+
 NSFFile::NSFFile(std::istream &file_stream)
     : AudioFile{file_stream}, header{file_stream} {}
 
 NSFFile::~NSFFile() {}
 
-vector<audio_data> NSFFile::read(size_t nb_bytes) {
-  vector<audio_data> v;
+vector<AudioData> NSFFile::read(size_t nb_bytes) {
+  vector<AudioData> v;
   return v;
 }
 

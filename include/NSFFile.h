@@ -32,7 +32,7 @@ struct NSFWord {
   value_type get_value() { return (high << 8) + low; }
 };
 
-struct NSFHeader : public audio_header {
+struct NSFHeader : public AudioHeader {
   using address = NSFWord;
   using speed = NSFWord;
   using quantity = NSFWord::half_word;
@@ -56,8 +56,9 @@ struct NSFHeader : public audio_header {
   std::vector<quantity> expansion_bits;
 
   NSFHeader(std::istream &file_stream);
+  ~NSFHeader() override;
 
-  speed get_rate() {}
+  unsigned int get_rate() override;
 };
 
 class NSFFile : public AudioFile {
@@ -66,7 +67,7 @@ private:
 
 public:
   NSFFile(std::istream &file_stream);
-  std::vector<audio_data> read(size_t nb_bytes) override;
+  std::vector<AudioData> read(size_t nb_bytes) override;
   const NSFHeader &getHeader() const override;
   ~NSFFile() override;
 };

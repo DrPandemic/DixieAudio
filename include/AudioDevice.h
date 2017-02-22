@@ -6,12 +6,12 @@
 
 class AudioDevice {
 protected:
-  audio_header header;
+  AudioHeader header;
 
 public:
-  AudioDevice(audio_header header) : header{header} {};
+  AudioDevice(AudioHeader header) : header{header} {};
   virtual ~AudioDevice(){};
-  virtual int write(std::vector<audio_data> data) = 0;
+  virtual int write(std::vector<AudioData> data) = 0;
 };
 
 #endif // DIXIEAUDIO_AUDIO_DEVICE_H
