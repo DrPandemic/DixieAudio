@@ -1,4 +1,4 @@
-#include "NSF_file.cpp"
+#include "NSFFile.cpp"
 #include "gtest/gtest.h"
 #include <fstream>
 #include <sstream>
@@ -24,12 +24,11 @@ TEST(reader_test, reader_test_NSFHeader) {
 
   ss.write(reinterpret_cast<char const *>(data), sizeof data);
 
-  NSF_file marioNSF(ss);
-  NSF_header marioHeader = marioNSF.getHeader();
+  NSFFile marioNSF(ss);
+  NSFHeader marioHeader = marioNSF.getHeader();
 
-  std::vector<NSF_header::quantity> bankswitch_init_values(8,0);
-  std::vector<NSF_header::quantity> expansion_bits(4,0);
-
+  std::vector<NSFHeader::quantity> bankswitch_init_values(8, 0);
+  std::vector<NSFHeader::quantity> expansion_bits(4, 0);
 
   EXPECT_EQ(marioHeader.format_file, "NESM\x1A");
   EXPECT_EQ(marioHeader.version_number, 1);
@@ -46,10 +45,16 @@ TEST(reader_test, reader_test_NSFHeader) {
   EXPECT_EQ(marioHeader.copyright_holder, "1985 Nintendo");
   EXPECT_EQ(marioHeader.NTSC_speed.low, 0x1A);
   EXPECT_EQ(marioHeader.NTSC_speed.high, 0x41);
-  EXPECT_EQ(marioHeader.bankswitch_init_values,  bankswitch_init_values);
+  EXPECT_EQ(marioHeader.bankswitch_init_values, bankswitch_init_values);
   EXPECT_EQ(marioHeader.PAL_speed.low, 0);
   EXPECT_EQ(marioHeader.PAL_speed.high, 0);
   EXPECT_EQ(marioHeader.NSF_type, 0);
-  EXPECT_EQ(marioHeader.extra_chip_support, NSF_type::NTSC);
+  EXPECT_EQ(marioHeader.extra_chip_support, NSFType::NTSC);
   EXPECT_EQ(marioHeader.expansion_bits, expansion_bits);
+}
+
+TEST(reader_test, reader_test_nsfword) {
+  NSFWord word{26, 65};
+
+  EXPECT_EQ(word.get_value(), 16666);
 }

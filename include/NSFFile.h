@@ -21,12 +21,15 @@ enum ChipSupport {
 
 struct NSFWord {
   using half_word = unsigned int;
+  using value_type = unsigned int;
 
   half_word low;
   half_word high;
 
   NSFWord(half_word low, half_word high) : low{low}, high{high} {}
   NSFWord(){};
+
+  value_type get_value() { return (high << 8) + low; }
 };
 
 struct NSFHeader : public audio_header {
@@ -54,9 +57,7 @@ struct NSFHeader : public audio_header {
 
   NSFHeader(std::istream &file_stream);
 
-  speed get_rate(){
-
-  }
+  speed get_rate() {}
 };
 
 class NSFFile : public AudioFile {
