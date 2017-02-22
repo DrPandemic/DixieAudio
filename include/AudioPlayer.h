@@ -1,17 +1,17 @@
 #ifndef DIXIEAUDIO_AUDIO_PLAYER_H
 #define DIXIEAUDIO_AUDIO_PLAYER_H
 
-#include "NSF_file.h"
-#include "pulseaudio_device.h"
+#include "NSFFile.h"
+#include "PulseaudioDevice.h"
 #include <memory>
 
-class audio_player {
+class AudioPlayer {
 private:
   // thread_safe_queue HUGO
 
 public:
-  audio_player(std::unique_ptr<pulseaudio_device> audio_device);
-  void start(std::unique_ptr<NSF_file> audio_file);
+  AudioPlayer(std::unique_ptr<PulseaudioDevice> audio_device);
+  void start(std::unique_ptr<NSFFile> audio_file);
   void stop();
   void resume();
   void next();

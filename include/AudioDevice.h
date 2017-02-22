@@ -1,16 +1,16 @@
 #ifndef DIXIEAUDIO_AUDIO_DEVICE_H
 #define DIXIEAUDIO_AUDIO_DEVICE_H
 
-#include "./audio_file.h"
+#include "AudioFile.h"
 #include <vector>
 
-class audio_device {
+class AudioDevice {
 protected:
   audio_header header;
 
 public:
-  audio_device(audio_header header) : header{header} {};
-  virtual ~audio_device(){};
+  AudioDevice(audio_header header) : header{header} {};
+  virtual ~AudioDevice(){};
   virtual int write(std::vector<audio_data> data) = 0;
 };
 

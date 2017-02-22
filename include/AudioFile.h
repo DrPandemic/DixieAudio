@@ -8,15 +8,15 @@ using audio_data = char;
 
 struct audio_header {};
 
-class audio_file {
+class AudioFile {
 protected:
   std::istream &file_stream;
 
 public:
-  audio_file(std::istream &file_stream) : file_stream{file_stream} {};
+  AudioFile(std::istream &file_stream) : file_stream{file_stream} {};
   virtual std::vector<audio_data> read(size_t nb_bytes) = 0;
   virtual const audio_header &getHeader() const = 0;
-  virtual ~audio_file(){};
+  virtual ~AudioFile(){};
 };
 
 #endif // DIXIEAUDIO_AUDIO_FILE_H

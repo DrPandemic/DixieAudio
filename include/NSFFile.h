@@ -1,13 +1,13 @@
 #ifndef DIXIEAUDIO_NSF_FILE_H
 #define DIXIEAUDIO_NSF_FILE_H
 
-#import "./audio_file.h"
+#import "AudioFile.h"
 #import <istream>
 #import <vector>
 
-enum NSF_type { NTSC = 0, PAL = 1, DUAL = 2 };
+enum NSFType { NTSC = 0, PAL = 1, DUAL = 2 };
 
-enum chip_support {
+enum ChipSupport {
   NONE = 0,
   VRCVI = 1 << 0,
   VCRVII = 1 << 1,
@@ -19,20 +19,20 @@ enum chip_support {
   expansion_2 = 1 << 7
 };
 
-struct NSF_word {
+struct NSFWord {
   using half_word = unsigned int;
 
   half_word low;
   half_word high;
 
-  NSF_word(half_word low, half_word high) : low{low}, high{high} {}
-  NSF_word(){};
+  NSFWord(half_word low, half_word high) : low{low}, high{high} {}
+  NSFWord(){};
 };
 
-struct NSF_header : public audio_header {
-  using address = NSF_word;
-  using speed = NSF_word;
-  using quantity = NSF_word::half_word;
+struct NSFHeader : public audio_header {
+  using address = NSFWord;
+  using speed = NSFWord;
+  using quantity = NSFWord::half_word;
   using flags = quantity;
 
   std::string format_file;
@@ -48,28 +48,32 @@ struct NSF_header : public audio_header {
   speed NTSC_speed;
   std::vector<quantity> bankswitch_init_values;
   speed PAL_speed;
-  NSF_type NSF_type;
+  NSFType NSF_type;
   flags extra_chip_support;
   std::vector<quantity> expansion_bits;
 
-  NSF_header(std::istream &file_stream);
+  NSFHeader(std::istream &file_stream);
+
+  speed get_rate(){
+
+  }
 };
 
-class NSF_file : public audio_file {
+class NSFFile : public AudioFile {
 private:
-  NSF_header header;
+  NSFHeader header;
 
 public:
-  NSF_file(std::istream &file_stream);
+  NSFFile(std::istream &file_stream);
   std::vector<audio_data> read(size_t nb_bytes) override;
-  const NSF_header &getHeader() const override;
-  ~NSF_file() override;
+  const NSFHeader &getHeader() const override;
+  ~NSFFile() override;
 };
 
-std::ostream &operator<<(std::ostream &, const NSF_word &);
+std::ostream &operator<<(std::ostream &, const NSFWord &);
 
-std::ostream &operator<<(std::ostream &, const NSF_header &);
+std::ostream &operator<<(std::ostream &, const NSFHeader &);
 
-std::ostream &operator<<(std::ostream &, const NSF_file &);
+std::ostream &operator<<(std::ostream &, const NSFFile &);
 
 #endif // DIXIEAUDIO_NSF_FILE_H

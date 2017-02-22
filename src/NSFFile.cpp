@@ -1,12 +1,12 @@
-#include "../include/NSF_file.h"
-#include "../include/audio_file.h"
+#include "../include/NSFFile.h"
+#include "../include/AudioFile.h"
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 
 using namespace std;
 
-NSF_header::NSF_header(istream &file_stream) {
+NSFHeader::NSFHeader(istream &file_stream) {
   file_stream >> std::noskipws;
   using ii = istream_iterator<uint8_t>;
 
@@ -30,7 +30,7 @@ NSF_header::NSF_header(istream &file_stream) {
   copy_n(ii(file_stream), 1, &NTSC_speed.high);
   bankswitch_init_values.reserve(8);
   for (int i = 0; i < 8; ++i) {
-    NSF_header::quantity tmp;
+    NSFHeader::quantity tmp;
     copy_n(ii(file_stream), 1, &tmp);
     bankswitch_init_values.push_back(tmp);
   }
@@ -39,40 +39,40 @@ NSF_header::NSF_header(istream &file_stream) {
 
   int tmp;
   copy_n(ii(file_stream), 1, &tmp);
-  if (tmp == NSF_type::NTSC)
-    NSF_type = NSF_type::NTSC;
-  else if (tmp == NSF_type::PAL)
-    NSF_type = NSF_type::PAL;
+  if (tmp == NSFType::NTSC)
+    NSF_type = NSFType::NTSC;
+  else if (tmp == NSFType::PAL)
+    NSF_type = NSFType::PAL;
   else
-    NSF_type = NSF_type::DUAL;
+    NSF_type = NSFType::DUAL;
 
   copy_n(ii(file_stream), 1, &extra_chip_support);
   expansion_bits.reserve(4);
   for (int i = 0; i < 4; ++i) {
-    NSF_header::quantity tmp;
+    NSFHeader::quantity tmp;
     copy_n(ii(file_stream), 1, &tmp);
     expansion_bits.push_back(tmp);
   }
 }
 
-NSF_file::NSF_file(std::istream &file_stream)
-    : audio_file{file_stream}, header{file_stream} {}
+NSFFile::NSFFile(std::istream &file_stream)
+    : AudioFile{file_stream}, header{file_stream} {}
 
-NSF_file::~NSF_file() {}
+NSFFile::~NSFFile() {}
 
-vector<audio_data> NSF_file::read(size_t nb_bytes) {
+vector<audio_data> NSFFile::read(size_t nb_bytes) {
   vector<audio_data> v;
   return v;
 }
 
-const NSF_header &NSF_file::getHeader() const { return header; }
+const NSFHeader &NSFFile::getHeader() const { return header; }
 
-std::ostream &operator<<(std::ostream &os, const NSF_word &w) {
+std::ostream &operator<<(std::ostream &os, const NSFWord &w) {
   os << std::endl << "  Low: " << w.low << std::endl;
   return os << "  High: " << w.high;
 }
 
-std::ostream &operator<<(std::ostream &os, const NSF_header &h) {
+std::ostream &operator<<(std::ostream &os, const NSFHeader &h) {
   os << "Format: " << h.format_file << std::endl;
   os << "Version: " << h.version_number << std::endl;
   os << "Songs: " << h.total_songs << std::endl;
@@ -97,6 +97,6 @@ std::ostream &operator<<(std::ostream &os, const NSF_header &h) {
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const NSF_file &f) {
+std::ostream &operator<<(std::ostream &os, const NSFFile &f) {
   return os << f.getHeader();
 }

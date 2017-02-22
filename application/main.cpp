@@ -1,4 +1,4 @@
-#include "../include/NSF_file.h"
+#include "../include/NSFFile.h"
 #include <fstream>
 #include <iostream>
 
@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in | std::ios::binary);
-  NSF_file f(s);
+  NSFFile f(s);
 
   cout << f;
 }
