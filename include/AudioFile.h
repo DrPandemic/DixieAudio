@@ -4,7 +4,7 @@
 #include <istream>
 #include <vector>
 
-using AudioData = char;
+using AudioData = unsigned int;
 
 struct AudioHeader {
   virtual unsigned int get_rate() const = 0;
@@ -19,7 +19,7 @@ protected:
 public:
   AudioFile(std::istream &file_stream) : file_stream{file_stream} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
-  virtual const AudioHeader &getHeader() const = 0;
+  virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};
 };
 

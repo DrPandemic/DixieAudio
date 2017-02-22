@@ -8,7 +8,7 @@ class AudioDevice {
 public:
   AudioDevice(const AudioHeader &){};
   virtual ~AudioDevice(){};
-  virtual int write(std::vector<AudioData> data) = 0;
+  virtual int write(const std::vector<AudioData> data) = 0;
 };
 
 #endif // DIXIEAUDIO_AUDIO_DEVICE_H

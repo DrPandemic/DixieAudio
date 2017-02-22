@@ -75,7 +75,7 @@ vector<AudioData> NSFFile::read(size_t nb_bytes) {
   return v;
 }
 
-const NSFHeader &NSFFile::getHeader() const { return header; }
+const NSFHeader &NSFFile::get_header() const { return header; }
 
 std::ostream &operator<<(std::ostream &os, const NSFWord &w) {
   os << std::endl << "  Low: " << w.low << std::endl;
@@ -108,5 +108,5 @@ std::ostream &operator<<(std::ostream &os, const NSFHeader &h) {
 }
 
 std::ostream &operator<<(std::ostream &os, const NSFFile &f) {
-  return os << f.getHeader();
+  return os << f.get_header();
 }
