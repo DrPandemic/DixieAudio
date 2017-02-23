@@ -1,33 +1,21 @@
+#include "../include/AudioPlayer.h"
 #include "../include/NSFFile.h"
 #include "../include/PulseaudioDevice.h"
+#include <boost/chrono.hpp>
+#include <boost/lockfree/queue.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include<boost/lockfree/queue.hpp>
+#include <memory>
 
 using namespace std;
 
 int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in | std::ios::binary);
-  NSFFile f(s);
+  auto f = make_unique<NSFFile>(s);
+  auto p2 = make_unique<PulseaudioDevice>(f->get_header());
+  AudioPlayer player(std::move(p2));
 
-  boost::lockfree::queue<int> q;
-
-  PulseaudioDevice p(f.get_header());
-
-  while (true) {
-
-    vector<AudioData> v;
-
-    for (int j = 0; j < 200; j++) {
-
-      AudioData i = rand() % 1000;
-      v.push_back(i);
-    }
-
-    const vector<AudioData> v2(v);
-    p.write(v2);
-
-    cout << "HELLO JS" << endl;
-  }
+  player.start(std::move(f));
+  boost::this_thread::sleep_for(boost::chrono::seconds{2});
 }

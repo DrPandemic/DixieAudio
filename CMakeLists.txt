@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 project (DixieAudio)
-set(clang++ "${CMAKE_CXX_FLAGS} -std=c++14")
+set(clang++ "${CMAKE_CXX_FLAGS} -std=c++14 -pthread -lboost_system -lboost_thread")
 
 set(CMAKE_CXX_STANDARD 14) # C++11...
 set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
@@ -13,7 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(dixieaudio_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(dixieaudio_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
-find_package(Boost 1.58 REQUIRED)
+find_package(Boost 1.58 REQUIRED COMPONENTS system thread date_time)
 include_directories(${Boost_INCLUDE_DIR})
 
 file(GLOB DIXIEAUDIO_SOURCE
@@ -43,5 +43,5 @@ set(LibPulseSimple_PROCESS_LIBS LibPulseSimple_LIBRARY)
 libfind_process(LibPulseSimple)
 
 add_executable(DixieAudio ${DIXIEAUDIO_SOURCE})
-target_link_libraries(DixieAudio ${LibPulseSimple_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(DixieAudio ${LibPulseSimple_LIBRARIES} ${Boost_LIBRARIES} -lpthread)
 

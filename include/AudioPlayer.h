@@ -3,11 +3,34 @@
 
 #include "NSFFile.h"
 #include "PulseaudioDevice.h"
+#include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
+
+enum AudioPlayerState { playing, stopped, paused };
+enum AudioPlayerCommand {
+  start,
+  stop,
+  resume,
+  next,
+  previous,
+  skip_to,
+};
+
+struct Message {
+  AudioPlayerCommand command;
+  std::unique_ptr<AudioFile> audio_file;
+  int skip_to_track_id;
+};
 
 class AudioPlayer {
 private:
-  // thread_safe_queue HUGO
+  std::unique_ptr<AudioDevice> device;
+  std::unique_ptr<AudioFile> audio_file;
+  boost::sync_queue<Message> message_queue;
+  int current_song;
+
+  void main_loop();
+  bool execute_command();
 
 public:
   AudioPlayer(std::unique_ptr<PulseaudioDevice> audio_device);
