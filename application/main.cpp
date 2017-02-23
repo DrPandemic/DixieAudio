@@ -3,12 +3,15 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include<boost/lockfree/queue.hpp>
 
 using namespace std;
 
 int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in | std::ios::binary);
   NSFFile f(s);
+
+  boost::lockfree::queue<int> q;
 
   PulseaudioDevice p(f.get_header());
 
