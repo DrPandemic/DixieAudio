@@ -1,5 +1,4 @@
 #include "../include/AudioPlayer.h"
-#include "../src/AudioPlayer.cpp"
 #include "../include/NSFFile.h"
 #include "../include/PulseaudioDevice.h"
 #include <boost/chrono.hpp>
@@ -11,11 +10,17 @@
 
 using namespace std;
 
+struct PulseFactory : public AudioDeviceFactory {
+  AudioDevice operator()(const AudioHeader &header) override {
+    return PulseaudioDevice(header);
+  };
+};
+
 int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in | std::ios::binary);
   auto f = make_unique<NSFFile>(s);
-  AudioPlayer<PulseaudioDevice> player{};
+  AudioPlayer player{PulseFactory{}};
 
-  player.start(std::move(f));
-  boost::this_thread::sleep_for(boost::chrono::seconds{2});
+  // player.start(std::move(f));
+  // boost::this_thread::sleep_for(boost::chrono::seconds{2});
 }

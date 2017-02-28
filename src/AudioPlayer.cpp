@@ -3,16 +3,16 @@
 
 using namespace std;
 
-template <class DeviceType> AudioPlayer<DeviceType>::AudioPlayer() {
-  boost::thread t1(&AudioPlayer<DeviceType>::main_loop, this);
+AudioPlayer::AudioPlayer(AudioDeviceFactory df) : device_factory{df} {
+  boost::thread t1(&AudioPlayer::main_loop, this);
 }
 
-template <class DeviceType> void AudioPlayer<DeviceType>::main_loop() {
+void AudioPlayer::main_loop() {
   while (execute_command()) {
   }
 }
 
-template <class DeviceType> bool AudioPlayer<DeviceType>::execute_command() {
+bool AudioPlayer::execute_command() {
   if (!message_queue.empty()) {
     cout << 123;
     auto message = message_queue.pull();
@@ -42,18 +42,15 @@ template <class DeviceType> bool AudioPlayer<DeviceType>::execute_command() {
   return true;
 }
 
-template <class DeviceType>
-void AudioPlayer<DeviceType>::start(unique_ptr<NSFFile> audio_file) {
-
-  device = make_unique<DeviceType>(audio_file->get_header());
+void AudioPlayer::start(unique_ptr<NSFFile> audio_file) {
+  // device = make_unique<AudioDevice>(audio_file->get_header());
   Message message;
   message.command = AudioPlayerCommand::start;
   message.audio_file = move(audio_file);
   message_queue.push(move(message));
 }
-template <class DeviceType> void AudioPlayer<DeviceType>::stop() {}
-template <class DeviceType> void AudioPlayer<DeviceType>::resume() {}
-template <class DeviceType> void AudioPlayer<DeviceType>::next() {}
-template <class DeviceType> void AudioPlayer<DeviceType>::previous() {}
-template <class DeviceType>
-void AudioPlayer<DeviceType>::skip_to(int track_id) {}
+void AudioPlayer::stop() {}
+void AudioPlayer::resume() {}
+void AudioPlayer::next() {}
+void AudioPlayer::previous() {}
+void AudioPlayer::skip_to(int track_id) {}

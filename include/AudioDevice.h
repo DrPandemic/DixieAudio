@@ -11,4 +11,8 @@ public:
   virtual int write(const std::vector<AudioData> data) = 0;
 };
 
+struct AudioDeviceFactory {
+  virtual AudioDevice operator()(const AudioHeader &);
+};
+
 #endif // DIXIEAUDIO_AUDIO_DEVICE_H
