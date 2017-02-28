@@ -12,7 +12,7 @@ public:
 };
 
 struct AudioDeviceFactory {
-  virtual AudioDevice operator()(const AudioHeader &);
+  virtual AudioDevice *operator()(const AudioHeader &header) = 0;
 };
 
 #endif // DIXIEAUDIO_AUDIO_DEVICE_H
