@@ -18,4 +18,10 @@ private:
   int pulse_error_code;
 };
 
+struct PulseFactory : public AudioDeviceFactory {
+  AudioDevice *operator()(const AudioHeader &header) override {
+    return new PulseaudioDevice(header);
+  };
+};
+
 #endif // DIXIEAUDIO_PULSEAUDIO_DEVICE_H
