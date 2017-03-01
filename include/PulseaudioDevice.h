@@ -8,20 +8,16 @@
 
 class PulseaudioDevice : public AudioDevice {
 public:
+  PulseaudioDevice();
   PulseaudioDevice(const AudioHeader &);
   ~PulseaudioDevice() override;
+  void reset_device(const AudioHeader &) override;
 
   int write(const std::vector<AudioData> data) override;
 
 private:
-  pa_simple *device;
+  std::unique_ptr<pa_simple, decltype(&pa_simple_free)> device;
   int pulse_error_code;
-};
-
-struct PulseFactory : public AudioDeviceFactory {
-  AudioDevice *operator()(const AudioHeader &header) override {
-    return new PulseaudioDevice(header);
-  };
 };
 
 #endif // DIXIEAUDIO_PULSEAUDIO_DEVICE_H

@@ -6,13 +6,11 @@
 
 class AudioDevice {
 public:
+  AudioDevice(){};
   AudioDevice(const AudioHeader &){};
   virtual ~AudioDevice(){};
   virtual int write(const std::vector<AudioData> data) = 0;
-};
-
-struct AudioDeviceFactory {
-  virtual AudioDevice *operator()(const AudioHeader &header) = 0;
+  virtual void reset_device(const AudioHeader &header) = 0;
 };
 
 #endif // DIXIEAUDIO_AUDIO_DEVICE_H

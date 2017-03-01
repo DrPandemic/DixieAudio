@@ -27,7 +27,6 @@ private:
   std::unique_ptr<AudioDevice> device;
   std::unique_ptr<AudioFile> audio_file;
   boost::sync_queue<Message> message_queue;
-  std::unique_ptr<AudioDeviceFactory> device_factory;
 
   int current_song;
   AudioPlayerState current_state = stopped;
@@ -36,7 +35,7 @@ private:
   bool execute_command();
 
 public:
-  AudioPlayer(std::unique_ptr<AudioDeviceFactory>);
+  AudioPlayer(std::unique_ptr<AudioDevice>);
   void start(std::unique_ptr<NSFFile> audio_file);
   void stop();
   void resume();

@@ -13,8 +13,8 @@ using namespace std;
 int main() {
   ifstream s("../nsf/mario.nsf", ifstream::in | std::ios::binary);
   auto f = make_unique<NSFFile>(s);
-  auto factory = make_unique<PulseFactory>();
-  AudioPlayer player{move(factory)};
+  unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
+  AudioPlayer player{move(device)};
 
   player.start(std::move(f));
   boost::this_thread::sleep_for(boost::chrono::seconds{2});

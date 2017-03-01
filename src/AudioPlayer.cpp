@@ -3,8 +3,8 @@
 
 using namespace std;
 
-AudioPlayer::AudioPlayer(unique_ptr<AudioDeviceFactory> df)
-    : device_factory{move(df)} {
+AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
+    : device{move(device)} {
   boost::thread t1(&AudioPlayer::main_loop, this);
 }
 
@@ -44,8 +44,7 @@ bool AudioPlayer::execute_command() {
 }
 
 void AudioPlayer::start(unique_ptr<NSFFile> audio_file) {
-  device = std::unique_ptr<AudioDevice>(
-      device_factory.get()->operator()(audio_file->get_header()));
+  device->reset_device(audio_file->get_header());
   Message message;
   message.command = AudioPlayerCommand::start;
   message.audio_file = move(audio_file);
