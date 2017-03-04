@@ -3,6 +3,8 @@
 
 #include "AudioDevice.h"
 #include "NSFFile.h"
+#include <atomic>
+#include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
 
@@ -28,9 +30,10 @@ private:
   std::unique_ptr<AudioDevice> device;
   std::unique_ptr<AudioFile> audio_file;
   boost::sync_queue<Message> message_queue;
+  boost::thread main_thread;
 
   int current_song;
-  AudioPlayerState current_state = stopped;
+  std::atomic<AudioPlayerState> current_state;
 
   void main_loop();
   bool execute_command();
@@ -44,7 +47,8 @@ public:
   void previous();
   void skip_to(int track_id);
 
-  const AudioPlayerState &get_state() const;
+  AudioPlayerState get_state() const;
+  void join();
 };
 
 #endif // DIXIEAUDIO_AUDIO_PLAYER_H

@@ -1,14 +1,13 @@
 #include "../include/AudioPlayer.h"
-#include <boost/thread.hpp>
 
 using namespace std;
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
-    : device{move(device)}, current_state{AudioPlayerState::stopped} {
-  boost::thread t1(&AudioPlayer::main_loop, this);
-}
+    : device{move(device)}, main_thread{&AudioPlayer::main_loop, this},
+      current_state{AudioPlayerState::stopped} {}
 
-const AudioPlayerState &AudioPlayer::get_state() const { return current_state; }
+AudioPlayerState AudioPlayer::get_state() const { return current_state; }
+void AudioPlayer::join() { main_thread.join(); };
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
@@ -40,7 +39,7 @@ bool AudioPlayer::execute_command() {
     // cout << message.audio_file->get_header().get_rate() << endl;
     // cout << current_state << endl;
 
-    // return false;
+    return false;
   }
 
   return true;
