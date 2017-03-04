@@ -30,15 +30,31 @@ auto get_file() {
 
 TEST(player_test, can_start_playing) {
   auto device_ptr = new StrictMock<MockAudioDevice>{};
+  EXPECT_CALL(*device_ptr, reset_device(_)).WillOnce(Return());
   auto device = unique_ptr<StrictMock<MockAudioDevice>>(device_ptr);
   AudioPlayer player{move(device)};
   auto file = get_file();
 
+  ASSERT_EQ(player.get_state(), AudioPlayerState::stopped);
+  player.start(std::move(file));
+  ASSERT_EQ(player.get_state(), AudioPlayerState::playing);
+
+  player.kill();
+}
+
+TEST(player_test, can_resume) {
+  auto device_ptr = new StrictMock<MockAudioDevice>{};
   EXPECT_CALL(*device_ptr, reset_device(_)).WillOnce(Return());
+  auto device = unique_ptr<StrictMock<MockAudioDevice>>(device_ptr);
+  AudioPlayer player{move(device)};
+  auto file = get_file();
 
   ASSERT_EQ(player.get_state(), AudioPlayerState::stopped);
   player.start(std::move(file));
-  boost::this_thread::sleep_for(boost::chrono::nanoseconds{2});
+  ASSERT_EQ(player.get_state(), AudioPlayerState::playing);
+  player.stop();
+  ASSERT_EQ(player.get_state(), AudioPlayerState::paused);
+  player.resume();
   ASSERT_EQ(player.get_state(), AudioPlayerState::playing);
 
   player.kill();
