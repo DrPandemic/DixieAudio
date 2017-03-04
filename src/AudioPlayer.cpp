@@ -4,9 +4,11 @@
 using namespace std;
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
-    : device{move(device)} {
+    : device{move(device)}, current_state{AudioPlayerState::stopped} {
   boost::thread t1(&AudioPlayer::main_loop, this);
 }
+
+const AudioPlayerState &AudioPlayer::get_state() const { return current_state; }
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
@@ -15,7 +17,6 @@ void AudioPlayer::main_loop() {
 
 bool AudioPlayer::execute_command() {
   if (!message_queue.empty()) {
-    cout << 123;
     auto message = message_queue.pull();
 
     switch (message.command) {
@@ -31,13 +32,15 @@ bool AudioPlayer::execute_command() {
       current_state = playing;
     case (AudioPlayerCommand::skip_to):
       current_state = playing;
+    case (AudioPlayerCommand::kill_thread):
+      return false;
     }
 
-    cout << message.command << endl;
-    cout << message.audio_file->get_header().get_rate() << endl;
-    cout << current_state << endl;
+    // cout << message.command << endl;
+    // cout << message.audio_file->get_header().get_rate() << endl;
+    // cout << current_state << endl;
 
-    return false;
+    // return false;
   }
 
   return true;

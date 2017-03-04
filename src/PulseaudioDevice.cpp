@@ -5,7 +5,6 @@
 using namespace std;
 
 PulseaudioDevice::PulseaudioDevice() : device(nullptr, &pa_simple_free) {
-
   pa_sample_spec ss;
   ss.format = PA_SAMPLE_U8;
   ss.channels = 1;
@@ -24,13 +23,11 @@ PulseaudioDevice::PulseaudioDevice() : device(nullptr, &pa_simple_free) {
 
 PulseaudioDevice::PulseaudioDevice(const AudioHeader &header)
     : AudioDevice(header), device(nullptr, &pa_simple_free) {
-
   reset_device(header);
 }
 PulseaudioDevice::~PulseaudioDevice() {}
 
 void PulseaudioDevice::reset_device(const AudioHeader &header) {
-
   pa_sample_spec ss;
   ss.format = PA_SAMPLE_U8; // in header?
   ss.channels = 1;          // in header?

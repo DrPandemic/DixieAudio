@@ -14,6 +14,7 @@ enum AudioPlayerCommand {
   next,
   previous,
   skip_to,
+  kill_thread,
 };
 
 struct Message {
@@ -42,6 +43,8 @@ public:
   void next();
   void previous();
   void skip_to(int track_id);
+
+  const AudioPlayerState &get_state() const;
 };
 
 #endif // DIXIEAUDIO_AUDIO_PLAYER_H

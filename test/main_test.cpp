@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 
+#include "AudioPlayerTests.cpp"
 #include "NSFHeaderTests.cpp"
 
 int main(int argc, char **argv) {
