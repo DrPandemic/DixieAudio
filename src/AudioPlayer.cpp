@@ -7,7 +7,6 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
       current_state{AudioPlayerState::stopped} {}
 
 AudioPlayerState AudioPlayer::get_state() const { return current_state; }
-void AudioPlayer::join() { main_thread.join(); };
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
@@ -38,8 +37,6 @@ bool AudioPlayer::execute_command() {
     // cout << message.command << endl;
     // cout << message.audio_file->get_header().get_rate() << endl;
     // cout << current_state << endl;
-
-    return false;
   }
 
   return true;
@@ -57,3 +54,9 @@ void AudioPlayer::resume() {}
 void AudioPlayer::next() {}
 void AudioPlayer::previous() {}
 void AudioPlayer::skip_to(int track_id) {}
+void AudioPlayer::kill() {
+  Message message;
+  message.command = AudioPlayerCommand::kill_thread;
+  message_queue.push(move(message));
+  main_thread.join();
+}

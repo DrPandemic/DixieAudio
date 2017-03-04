@@ -46,9 +46,9 @@ public:
   void next();
   void previous();
   void skip_to(int track_id);
+  void kill();
 
   AudioPlayerState get_state() const;
-  void join();
 };
 
 #endif // DIXIEAUDIO_AUDIO_PLAYER_H

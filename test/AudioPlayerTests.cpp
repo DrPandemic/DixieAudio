@@ -41,5 +41,5 @@ TEST(player_test, can_start_playing) {
   boost::this_thread::sleep_for(boost::chrono::nanoseconds{2});
   ASSERT_EQ(player.get_state(), AudioPlayerState::playing);
 
-  player.join();
+  player.kill();
 }
