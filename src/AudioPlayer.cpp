@@ -40,10 +40,6 @@ bool AudioPlayer::execute_command() {
       response_queue.push(Response{current_state});
       break;
     }
-
-    // cout << message.command << endl;
-    // cout << message.audio_file->get_header().get_rate() << endl;
-    // cout << current_state << endl;
   }
 
   return true;
@@ -63,9 +59,19 @@ void AudioPlayer::resume() {
   Message message{AudioPlayerCommand::resume};
   message_queue.push(move(message));
 }
-void AudioPlayer::next() {}
-void AudioPlayer::previous() {}
-void AudioPlayer::skip_to(int track_id) {}
+void AudioPlayer::next() {
+  Message message{AudioPlayerCommand::next};
+  message_queue.push(move(message));
+}
+void AudioPlayer::previous() {
+  Message message{AudioPlayerCommand::previous};
+  message_queue.push(move(message));
+}
+void AudioPlayer::skip_to(int track_id) {
+  Message message{AudioPlayerCommand::previous};
+  message.skip_to_track_id = track_id;
+  message_queue.push(move(message));
+}
 void AudioPlayer::kill() {
   Message message{AudioPlayerCommand::kill_thread};
   message_queue.push(move(message));
