@@ -2,6 +2,7 @@
 
 #include "AudioPlayerTests.cpp"
 #include "NSFHeaderTests.cpp"
+#include "WAVHeaderTests.cpp"
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
