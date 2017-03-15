@@ -41,6 +41,13 @@ const WAVHeader &WAVFile::get_header() const { return header; }
 
 std::ostream &operator<<(std::ostream &os, const WAVHeader &h) {
   os << "File size: " << h.file_size << std::endl;
+  os << "Format data length: " << h.format_data_length << std::endl;
+  os << "Format type: " << h.format_type << std::endl;
+  os << "Number of channels: " << h.number_of_channels << std::endl;
+  os << "Sample rate: " << h.sample_rate << std::endl;
+  os << "Channel type: " << h.channel_type << std::endl;
+  os << "Bits per sample: " << h.bits_per_sample << std::endl;
+  os << "Data size: " << h.data_size << std::endl;
 
   return os;
 }
