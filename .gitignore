@@ -51,3 +51,5 @@ googletest-src/
 
 .clang_complete
 *.nsf
+*.wav
+build/*
