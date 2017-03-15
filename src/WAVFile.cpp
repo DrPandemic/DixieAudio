@@ -9,11 +9,12 @@ using namespace std;
 WAVHeader::WAVHeader(istream &file_stream) : AudioHeader() {
   file_stream >> std::noskipws;
   using ii = istream_iterator<uint8_t>;
-  uint64_t garbage;
+  uint32_t garbage;
 
   copy_n(ii(file_stream), 4, &garbage);
   copy_n(ii(file_stream), 4, &file_size);
-  copy_n(ii(file_stream), 8, &garbage);
+  copy_n(ii(file_stream), 4, &garbage);
+  copy_n(ii(file_stream), 4, &garbage);
   copy_n(ii(file_stream), 4, &format_data_length);
   copy_n(ii(file_stream), 2, &format_type);
   copy_n(ii(file_stream), 2, &number_of_channels);
