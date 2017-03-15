@@ -5,7 +5,6 @@
 #import <istream>
 #import <vector>
 
-class WAVFile : public AudioFile {};
 struct WAVHeader : public AudioHeader {
   using string = std::string;
   using byte = uint8_t;
@@ -21,9 +20,28 @@ struct WAVHeader : public AudioHeader {
   size sample_rate;
   // 4 bytes
   uint16_t channel_type;
-  uint16_t bits_pet_sample;
+  uint16_t bits_per_sample;
   // 4 bytes
   size data_size;
+
+  WAVHeader(std::istream &file_stream);
+  ~WAVHeader() override{};
+
+  unsigned int get_rate() const override;
 };
+
+class WAVFile : public AudioFile {
+private:
+  WAVHeader header;
+
+public:
+  WAVFile(std::istream &file_stream);
+  std::vector<AudioData> read(size_t nb_bytes) override;
+  const WAVHeader &get_header() const override;
+  ~WAVFile() override;
+};
+
+std::ostream &operator<<(std::ostream &, const WAVHeader &);
+std::ostream &operator<<(std::ostream &, const WAVFile &);
 
 #endif // DIXIEAUDIO_WAVFILE_H
