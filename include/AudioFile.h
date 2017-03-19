@@ -20,6 +20,7 @@ protected:
 public:
   AudioFile(std::istream &file_stream) : file_stream{file_stream} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
+  virtual std::vector<AudioData> read_all() = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};
   bool is_valid() { return get_header().is_valid(); }

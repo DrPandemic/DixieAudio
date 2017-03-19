@@ -7,6 +7,10 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
+    if (current_state == AudioPlayerState::playing) {
+      auto data = audio_file->read_all();
+      device->write(data);
+    }
   }
 }
 
@@ -45,7 +49,7 @@ bool AudioPlayer::execute_command() {
   return true;
 }
 
-void AudioPlayer::start(unique_ptr<NSFFile> audio_file) {
+void AudioPlayer::start(unique_ptr<AudioFile> audio_file) {
   device->reset_device(audio_file->get_header());
   Message message{AudioPlayerCommand::start};
   message.audio_file = move(audio_file);

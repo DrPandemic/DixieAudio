@@ -18,6 +18,6 @@ int main() {
   unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
   AudioPlayer player{move(device)};
 
-  // player.start(std::move(f));
-  // boost::this_thread::sleep_for(boost::chrono::seconds{2});
+  player.start(std::move(f));
+  boost::this_thread::sleep_for(boost::chrono::seconds{10});
 }

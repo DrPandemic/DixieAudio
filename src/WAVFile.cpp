@@ -43,6 +43,19 @@ vector<AudioData> WAVFile::read(size_t nb_bytes) {
   return data;
 }
 
+vector<AudioData> WAVFile::read_all() {
+  vector<AudioData> data;
+  cout << 111 << endl;
+  auto size = get_header().data_size - 8;
+  cout << 222 << endl;
+  data.reserve(size);
+  cout << 123 << endl;
+  file_stream.read(&data[0], size);
+  cout << 444 << endl;
+
+  return data;
+}
+
 const WAVHeader &WAVFile::get_header() const { return header; }
 
 std::ostream &operator<<(std::ostream &os, const WAVHeader &h) {

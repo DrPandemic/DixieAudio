@@ -2,7 +2,7 @@
 #define DIXIEAUDIO_AUDIO_PLAYER_H
 
 #include "AudioDevice.h"
-#include "NSFFile.h"
+#include "WAVFile.h"
 #include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
@@ -49,7 +49,7 @@ private:
 
 public:
   AudioPlayer(std::unique_ptr<AudioDevice>);
-  void start(std::unique_ptr<NSFFile> audio_file);
+  void start(std::unique_ptr<AudioFile> audio_file);
   void stop();
   void resume();
   void next();

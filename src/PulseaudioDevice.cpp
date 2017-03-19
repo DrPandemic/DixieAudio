@@ -29,8 +29,8 @@ PulseaudioDevice::~PulseaudioDevice() {}
 
 void PulseaudioDevice::reset_device(const AudioHeader &header) {
   pa_sample_spec ss;
-  ss.format = PA_SAMPLE_U8; // in header?
-  ss.channels = 1;          // in header?
+  ss.format = PA_SAMPLE_S16LE; // in header?
+  ss.channels = 1;             // in header?
   ss.rate = header.get_rate();
 
   device.reset(pa_simple_new(nullptr,      // Use the default server.
