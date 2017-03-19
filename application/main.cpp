@@ -11,8 +11,7 @@
 using namespace std;
 
 int main() {
-  std::cout << "sdfsdfsdfsdfsd";
-  ifstream s("../music/mario_09.wav", ifstream::in | std::ios::binary);
+  ifstream s("../music/mario_08.wav", ifstream::in | std::ios::binary);
   auto f = make_unique<WAVFile>(s);
   auto file = *f;
   cout << file;

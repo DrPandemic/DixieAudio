@@ -1,29 +1,31 @@
 #include "../include/WAVFile.h"
 
-#include <algorithm>
 #include <iostream>
 #include <iterator>
 
 using namespace std;
 
+template <class destination> void read(istream &fs, destination &dest) {
+  fs.read(reinterpret_cast<char *>(&dest), sizeof(dest));
+}
+
 WAVHeader::WAVHeader(istream &file_stream) : AudioHeader() {
   file_stream >> std::noskipws;
-  using ii = istream_iterator<uint8_t>;
   uint32_t garbage;
 
-  copy_n(ii(file_stream), 4, &garbage);
-  copy_n(ii(file_stream), 4, &file_size);
-  copy_n(ii(file_stream), 4, &garbage);
-  copy_n(ii(file_stream), 4, &garbage);
-  copy_n(ii(file_stream), 4, &format_data_length);
-  copy_n(ii(file_stream), 2, &format_type);
-  copy_n(ii(file_stream), 2, &number_of_channels);
-  copy_n(ii(file_stream), 4, &sample_rate);
-  copy_n(ii(file_stream), 4, &garbage);
-  copy_n(ii(file_stream), 2, &channel_type);
-  copy_n(ii(file_stream), 2, &bits_per_sample);
-  copy_n(ii(file_stream), 4, &garbage);
-  copy_n(ii(file_stream), 4, &data_size);
+  read(file_stream, garbage);
+  read(file_stream, file_size);
+  read(file_stream, garbage);
+  read(file_stream, garbage);
+  read(file_stream, format_data_length);
+  read(file_stream, format_type);
+  read(file_stream, number_of_channels);
+  read(file_stream, sample_rate);
+  read(file_stream, garbage);
+  read(file_stream, channel_type);
+  read(file_stream, bits_per_sample);
+  read(file_stream, garbage);
+  read(file_stream, data_size);
 }
 
 unsigned int WAVHeader::get_rate() const { return sample_rate; }
