@@ -4,7 +4,7 @@
 #include <istream>
 #include <vector>
 
-using AudioData = unsigned int;
+using AudioData = char;
 
 struct AudioHeader {
   virtual unsigned int get_rate() const = 0;

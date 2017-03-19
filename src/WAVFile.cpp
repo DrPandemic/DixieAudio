@@ -36,8 +36,11 @@ WAVFile::WAVFile(std::istream &file_stream)
 WAVFile::~WAVFile() {}
 
 vector<AudioData> WAVFile::read(size_t nb_bytes) {
-  vector<AudioData> v;
-  return v;
+  vector<AudioData> data;
+  data.reserve(nb_bytes);
+  file_stream.read(&data[0], nb_bytes);
+
+  return data;
 }
 
 const WAVHeader &WAVFile::get_header() const { return header; }
