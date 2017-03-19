@@ -10,6 +10,7 @@ struct AudioHeader {
   virtual unsigned int get_rate() const = 0;
   virtual ~AudioHeader(){};
   AudioHeader(){};
+  virtual bool is_valid() const = 0;
 };
 
 class AudioFile {
@@ -21,6 +22,7 @@ public:
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};
+  bool is_valid() { return get_header().is_valid(); }
 };
 
 #endif // DIXIEAUDIO_AUDIO_FILE_H

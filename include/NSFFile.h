@@ -59,6 +59,7 @@ struct NSFHeader : public AudioHeader {
   ~NSFHeader() override;
 
   unsigned int get_rate() const override;
+  bool is_valid() const override { return false; }
 };
 
 class NSFFile : public AudioFile {
