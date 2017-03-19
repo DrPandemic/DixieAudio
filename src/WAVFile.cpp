@@ -45,13 +45,12 @@ vector<AudioData> WAVFile::read(size_t nb_bytes) {
 
 vector<AudioData> WAVFile::read_all() {
   vector<AudioData> data;
-  cout << 111 << endl;
-  auto size = get_header().data_size - 8;
-  cout << 222 << endl;
-  data.reserve(size);
-  cout << 123 << endl;
-  file_stream.read(&data[0], size);
-  cout << 444 << endl;
+  char tmp;
+  while (file_stream.good()) {
+    // TODO : CHANGE THIS MOFO
+    file_stream.read(&tmp, 1);
+    data.push_back(tmp);
+  }
 
   return data;
 }

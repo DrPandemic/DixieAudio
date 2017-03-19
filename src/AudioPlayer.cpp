@@ -10,6 +10,7 @@ void AudioPlayer::main_loop() {
     if (current_state == AudioPlayerState::playing) {
       auto data = audio_file->read_all();
       device->write(data);
+      break;
     }
   }
 }
@@ -20,6 +21,7 @@ bool AudioPlayer::execute_command() {
 
     switch (message.command) {
     case (AudioPlayerCommand::start):
+      audio_file = std::move(message.audio_file);
       current_state = playing;
       break;
     case (AudioPlayerCommand::stop):

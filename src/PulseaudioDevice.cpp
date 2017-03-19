@@ -45,5 +45,5 @@ void PulseaudioDevice::reset_device(const AudioHeader &header) {
 }
 
 int PulseaudioDevice::write(const std::vector<AudioData> data) {
-  return pa_simple_write(device.get(), &data[0], 200, nullptr);
+  return pa_simple_write(device.get(), &data[0], data.size(), nullptr);
 }
