@@ -28,7 +28,9 @@ struct WAVHeader : public AudioHeader {
   ~WAVHeader() override{};
 
   unsigned int get_rate() const override;
-  bool is_valid() const override { return format_type == 1; }
+  bool is_valid() const override {
+    return format_type == 1 && number_of_channels == 1 && bits_per_sample == 16;
+  }
 };
 
 class WAVFile : public AudioFile {
