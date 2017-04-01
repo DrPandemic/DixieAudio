@@ -10,7 +10,6 @@ void AudioPlayer::main_loop() {
     if (current_state == AudioPlayerState::playing) {
       auto data = audio_file->read_all();
       device->write(data);
-      break;
     }
   }
 }
