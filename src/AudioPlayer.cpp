@@ -88,6 +88,7 @@ void AudioPlayer::kill() {
   Message message{AudioPlayerCommand::kill_thread};
   message_queue.push(move(message));
   main_thread.join();
+  is_dying = true;
 }
 AudioPlayerState AudioPlayer::get_state() {
   Message message{AudioPlayerCommand::query_state};
@@ -98,3 +99,5 @@ AudioPlayerState AudioPlayer::get_state() {
 
   return r.state;
 }
+
+bool AudioPlayer::is_alive() { return !is_dying; }

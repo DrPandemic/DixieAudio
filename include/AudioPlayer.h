@@ -50,6 +50,8 @@ private:
   void main_loop();
   bool execute_command();
 
+  bool is_dying = false;
+
 public:
   AudioPlayer(std::unique_ptr<AudioDevice>);
   void start(std::unique_ptr<AudioFile> audio_file);
@@ -59,8 +61,7 @@ public:
   void previous();
   void skip_to(int track_id);
   void kill();
-  bool is_alive() { return true; };
-  void join(){};
+  bool is_alive();
 
   AudioPlayerState get_state();
 };
