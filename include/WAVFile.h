@@ -41,6 +41,8 @@ private:
 public:
   WAVFile(std::unique_ptr<std::istream> file_stream);
   std::vector<AudioData> read(size_t nb_bytes) override;
+  std::vector<AudioData> read_while(size_t nb_samples,
+                                    duration_t max_micro) override;
   std::vector<AudioData> read_all() override;
   const WAVHeader &get_header() const override;
   ~WAVFile() override;

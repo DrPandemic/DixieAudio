@@ -71,6 +71,7 @@ public:
   NSFFile(std::unique_ptr<std::istream> file_stream);
   std::vector<AudioData> read(size_t nb_bytes) override;
   std::vector<AudioData> read_all() override { return {}; };
+  std::vector<AudioData> read_while(size_t, duration_t) override { return {}; };
   const NSFHeader &get_header() const override;
   ~NSFFile() override;
 };

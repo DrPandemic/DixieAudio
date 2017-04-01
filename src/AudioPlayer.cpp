@@ -2,13 +2,17 @@
 
 using namespace std;
 
+constexpr const duration_t AudioPlayer::MAX_MS_PER_LOOP;
+
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {}
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
     if (current_state == AudioPlayerState::playing) {
-      auto data = audio_file->read(AudioPlayer::MAX_BYTE_PER_LOOP);
+      auto data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP,
+                                         AudioPlayer::MAX_MS_PER_LOOP);
+      cout << data.size() << endl;
       device->write(data);
 
       if (audio_file->eof())
