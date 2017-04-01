@@ -18,17 +18,28 @@ int main() {
   AudioPlayer player{move(device)};
   player.start(std::move(f));
 
+  while (player.is_alive()) {
 
-  while(player.is_alive()){
+    if (std::cin.rdbuf() and std::cin.rdbuf()->in_avail() >= 0) {
 
+      char user_cmd;
+      cin >> user_cmd;
+      cout << user_cmd << endl;
 
+      switch (user_cmd) {
+      case 's':
+        player.resume();
+        break; // prints "1",
+      case 'p':
+        player.stop();
+        break; // then prints "2"
+      }
+    }
   }
 
-
-
-  boost::this_thread::sleep( boost::posix_time::seconds(5) );
-  player.stop();
-  boost::this_thread::sleep( boost::posix_time::seconds(5) );
-  player.resume();
-  boost::this_thread::sleep_for(boost::chrono::seconds{10});
+  // boost::this_thread::sleep( boost::posix_time::seconds(5) );
+  // player.stop();
+  // boost::this_thread::sleep( boost::posix_time::seconds(5) );
+  // player.resume();
+  // boost::this_thread::sleep_for(boost::chrono::seconds{10});
 }
