@@ -19,11 +19,12 @@ TEST(reader_test, reader_test_NSFHeader) {
       0x00, 0x00, 0x1A, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-  std::stringstream ss(std::stringstream::in | std::stringstream::out);
+  auto ss =
+      make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
 
-  ss.write(reinterpret_cast<char const *>(data), sizeof data);
+  ss->write(reinterpret_cast<char const *>(data), sizeof data);
 
-  NSFFile marioNSF(ss);
+  NSFFile marioNSF(move(ss));
   NSFHeader marioHeader = marioNSF.get_header();
 
   std::vector<NSFHeader::quantity> bankswitch_init_values(8, 0);

@@ -2,6 +2,7 @@
 #define DIXIEAUDIO_AUDIO_FILE_H
 
 #include <istream>
+#include <memory>
 #include <vector>
 
 using AudioData = char;
@@ -15,15 +16,17 @@ struct AudioHeader {
 
 class AudioFile {
 protected:
-  std::istream &file_stream;
+  std::unique_ptr<std::istream> file_stream;
 
 public:
-  AudioFile(std::istream &file_stream) : file_stream{file_stream} {};
+  AudioFile(std::unique_ptr<std::istream> file_stream)
+      : file_stream{std::move(file_stream)} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
   virtual std::vector<AudioData> read_all() = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};
-  bool is_valid() { return get_header().is_valid(); }
+  bool is_valid() const { return get_header().is_valid(); }
+  bool eof() const { return file_stream->eof(); }
 };
 
 #endif // DIXIEAUDIO_AUDIO_FILE_H

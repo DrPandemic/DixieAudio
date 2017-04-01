@@ -8,8 +8,11 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
 void AudioPlayer::main_loop() {
   while (execute_command()) {
     if (current_state == AudioPlayerState::playing) {
-      auto data = audio_file->read_all();
+      auto data = audio_file->read(AudioPlayer::MAX_BYTE_PER_LOOP);
       device->write(data);
+
+      if (audio_file->eof())
+        current_state = AudioPlayerState::paused;
     }
   }
 }

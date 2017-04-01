@@ -30,15 +30,19 @@ WAVHeader::WAVHeader(istream &file_stream) : AudioHeader() {
 
 unsigned int WAVHeader::get_rate() const { return sample_rate; }
 
-WAVFile::WAVFile(std::istream &file_stream)
-    : AudioFile{file_stream}, header{file_stream} {}
+WAVFile::WAVFile(unique_ptr<istream> file_stream)
+    : AudioFile{move(file_stream)}, header{*this->file_stream} {}
 
 WAVFile::~WAVFile() {}
 
 vector<AudioData> WAVFile::read(size_t nb_bytes) {
   vector<AudioData> data;
   data.reserve(nb_bytes);
-  file_stream.read(&data[0], nb_bytes);
+  char tmp;
+  for (size_t i = 0; file_stream->good() && i < nb_bytes; ++i) {
+    file_stream->read(&tmp, 1);
+    data.push_back(tmp);
+  }
 
   return data;
 }
@@ -46,9 +50,8 @@ vector<AudioData> WAVFile::read(size_t nb_bytes) {
 vector<AudioData> WAVFile::read_all() {
   vector<AudioData> data;
   char tmp;
-  while (file_stream.good()) {
-    // TODO : CHANGE THIS MOFO
-    file_stream.read(&tmp, 1);
+  while (file_stream->good()) {
+    file_stream->read(&tmp, 1);
     data.push_back(tmp);
   }
 

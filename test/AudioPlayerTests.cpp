@@ -22,9 +22,10 @@ auto get_file() {
       0x00, 0x00, 0x1A, 0x41, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-  std::stringstream ss(std::stringstream::in | std::stringstream::out);
-  ss.write(reinterpret_cast<char const *>(data), sizeof data);
-  auto f = make_unique<NSFFile>(ss);
+  auto ss =
+      make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
+  ss->write(reinterpret_cast<char const *>(data), sizeof data);
+  auto f = make_unique<NSFFile>(move(ss));
 
   return f;
 }
@@ -44,9 +45,10 @@ TEST(player_test, can_start_playing) {
   player.kill();
 }
 
-TEST(DISABLED_player_test, can_resume) {
+TEST(player_test, can_resume) {
   auto device_ptr = new StrictMock<MockAudioDevice>{};
   EXPECT_CALL(*device_ptr, reset_device(_)).WillOnce(Return());
+  EXPECT_CALL(*device_ptr, write(_)).WillRepeatedly(Return(1));
   auto device = unique_ptr<StrictMock<MockAudioDevice>>(device_ptr);
   AudioPlayer player{move(device)};
   auto file = get_file();

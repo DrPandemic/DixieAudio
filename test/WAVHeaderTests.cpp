@@ -13,11 +13,12 @@ TEST(reader_test, reader_test_WAVHeader) {
                           0x00, 0x22, 0x56, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
                           0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00};
 
-  std::stringstream ss(std::stringstream::in | std::stringstream::out);
+  auto ss =
+      make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
 
-  ss.write(reinterpret_cast<char const *>(data), sizeof data);
+  ss->write(reinterpret_cast<char const *>(data), sizeof data);
 
-  WAVFile marioWAV(ss);
+  WAVFile marioWAV(move(ss));
   WAVHeader marioHeader = marioWAV.get_header();
 
   EXPECT_EQ(marioHeader.file_size, 75712);
@@ -44,15 +45,17 @@ TEST(reader_test, reader_test_ValidHeader) {
       0x01, 0x00, 0x11, 0x2B, 0x00, 0x00, 0x22, 0x56, 0x00, 0x00, 0x02,
       0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00};
 
-  std::stringstream ss_v(std::stringstream::in | std::stringstream::out);
-  std::stringstream ss_not_v(std::stringstream::in | std::stringstream::out);
+  auto ss_v =
+      make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
+  auto ss_not_v =
+      make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
 
-  ss_v.write(reinterpret_cast<char const *>(valid_data), sizeof valid_data);
-  ss_not_v.write(reinterpret_cast<char const *>(not_valid_data),
-                 sizeof not_valid_data);
+  ss_v->write(reinterpret_cast<char const *>(valid_data), sizeof valid_data);
+  ss_not_v->write(reinterpret_cast<char const *>(not_valid_data),
+                  sizeof not_valid_data);
 
-  WAVFile marioWAV_v(ss_v);
-  WAVFile marioWAV_not_v(ss_not_v);
+  WAVFile marioWAV_v(move(ss_v));
+  WAVFile marioWAV_not_v(move(ss_not_v));
 
   EXPECT_EQ(marioWAV_v.is_valid(), true);
   EXPECT_EQ(marioWAV_not_v.is_valid(), false);

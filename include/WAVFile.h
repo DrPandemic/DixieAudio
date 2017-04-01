@@ -3,6 +3,7 @@
 
 #import "AudioFile.h"
 #import <istream>
+#import <memory>
 #import <vector>
 
 struct WAVHeader : public AudioHeader {
@@ -38,7 +39,7 @@ private:
   WAVHeader header;
 
 public:
-  WAVFile(std::istream &file_stream);
+  WAVFile(std::unique_ptr<std::istream> file_stream);
   std::vector<AudioData> read(size_t nb_bytes) override;
   std::vector<AudioData> read_all() override;
   const WAVHeader &get_header() const override;

@@ -41,6 +41,9 @@ private:
   boost::sync_queue<Response> response_queue;
   boost::thread main_thread;
 
+  static const size_t MAX_BYTE_PER_LOOP = 10;
+  static const size_t MAX_MS_PER_LOOP = 100;
+
   int current_song;
   AudioPlayerState current_state = stopped;
 

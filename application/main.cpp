@@ -11,10 +11,9 @@
 using namespace std;
 
 int main() {
-  ifstream s("../music/mario_09.wav", ifstream::in | std::ios::binary);
-  auto f = make_unique<WAVFile>(s);
-  auto file = *f;
-  cout << file;
+  auto s = make_unique<ifstream>("../music/mario_09.wav",
+                                 ifstream::in | std::ios::binary);
+  auto f = make_unique<WAVFile>(move(s));
   unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
   AudioPlayer player{move(device)};
 

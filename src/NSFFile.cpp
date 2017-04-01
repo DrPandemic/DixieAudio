@@ -65,8 +65,8 @@ unsigned int NSFHeader::get_rate() const {
 
 NSFHeader::~NSFHeader() {}
 
-NSFFile::NSFFile(std::istream &file_stream)
-    : AudioFile{file_stream}, header{file_stream} {}
+NSFFile::NSFFile(unique_ptr<istream> file_stream)
+    : AudioFile{move(file_stream)}, header{*(this->file_stream)} {}
 
 NSFFile::~NSFFile() {}
 
