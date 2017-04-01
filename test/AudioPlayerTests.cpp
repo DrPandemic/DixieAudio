@@ -20,7 +20,7 @@ auto get_file() {
       make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
   ss->write(reinterpret_cast<char const *>(data), sizeof data);
 
-  auto f = make_unique<WAVFile>(ss);
+  auto f = make_unique<WAVFile>(move(ss));
 
   return f;
 }

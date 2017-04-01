@@ -14,7 +14,6 @@ void AudioPlayer::main_loop() {
                                          AudioPlayer::MAX_MS_PER_LOOP);
       device->write(data);
 
-      cout << audio_file->tellg() << endl;
       if (audio_file->eof()) {
         audio_file->restart();
       }

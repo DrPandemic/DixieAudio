@@ -59,6 +59,8 @@ public:
   void previous();
   void skip_to(int track_id);
   void kill();
+  bool is_alive() { return true; };
+  void join(){};
 
   AudioPlayerState get_state();
 };

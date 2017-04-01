@@ -1,0 +1,10 @@
+#ifndef DIXIEAUDIO_USERINTERFACE_H
+#define DIXIEAUDIO_USERINTERFACE_H
+
+
+class UserInterface {
+
+};
+
+
+#endif //DIXIEAUDIO_USERINTERFACE_H

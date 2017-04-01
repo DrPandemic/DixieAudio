@@ -16,7 +16,19 @@ int main() {
   auto f = make_unique<WAVFile>(move(s));
   unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
   AudioPlayer player{move(device)};
-
   player.start(std::move(f));
+
+
+  while(player.is_alive()){
+
+
+  }
+
+
+
+  boost::this_thread::sleep( boost::posix_time::seconds(5) );
+  player.stop();
+  boost::this_thread::sleep( boost::posix_time::seconds(5) );
+  player.resume();
   boost::this_thread::sleep_for(boost::chrono::seconds{10});
 }
