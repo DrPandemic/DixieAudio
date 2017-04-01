@@ -16,6 +16,7 @@ struct AudioHeader {
   virtual ~AudioHeader(){};
   AudioHeader(){};
   virtual bool is_valid() const = 0;
+  virtual size_t get_header_size() const = 0;
 };
 
 class AudioFile {
@@ -33,6 +34,11 @@ public:
   virtual ~AudioFile(){};
   bool is_valid() const { return get_header().is_valid(); }
   bool eof() const { return file_stream->eof(); }
+  void restart() {
+    file_stream->clear();
+    file_stream->seekg(get_header().get_header_size(), std::ios::beg);
+  }
+  std::streampos tellg() const { return file_stream->tellg(); }
 };
 
 #endif // DIXIEAUDIO_AUDIO_FILE_H

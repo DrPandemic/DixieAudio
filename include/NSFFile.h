@@ -61,6 +61,7 @@ struct NSFHeader : public AudioHeader {
 
   unsigned int get_rate() const override;
   bool is_valid() const override { return false; }
+  size_t get_header_size() const override { return 10; }
 };
 
 class NSFFile : public AudioFile {

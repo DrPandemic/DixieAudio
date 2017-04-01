@@ -32,6 +32,8 @@ struct WAVHeader : public AudioHeader {
   bool is_valid() const override {
     return format_type == 1 && number_of_channels == 1 && bits_per_sample == 16;
   }
+
+  size_t get_header_size() const override { return 44; }
 };
 
 class WAVFile : public AudioFile {

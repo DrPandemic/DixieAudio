@@ -12,11 +12,12 @@ void AudioPlayer::main_loop() {
     if (current_state == AudioPlayerState::playing) {
       auto data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP,
                                          AudioPlayer::MAX_MS_PER_LOOP);
-      cout << data.size() << endl;
       device->write(data);
 
-      if (audio_file->eof())
-        current_state = AudioPlayerState::paused;
+      cout << audio_file->tellg() << endl;
+      if (audio_file->eof()) {
+        audio_file->restart();
+      }
     }
   }
 }
