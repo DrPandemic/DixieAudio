@@ -8,8 +8,9 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {}
 
 void AudioPlayer::main_loop() {
-  while (execute_command()) {
-    bool isAlive = true;
+  bool isAlive = true;
+
+  while (isAlive) {
     auto time = minuter([&isAlive, this] { isAlive = execute_loop(); });
     // cout << time.count() << endl;
   }
@@ -46,10 +47,8 @@ bool AudioPlayer::execute_command() {
       buffer_sample =
           BUFFER_MICROS.count() * audio_file->get_header().get_rate();
       micro_per_loop = std::chrono::microseconds(
-          1'000'000 / audio_file->get_header().get_rate() /
-          MAX_SAMPLES_PER_LOOP);
-        cout << "yolo" << buffer_sample << endl;
-        cout << micro_per_loop.count() << endl;
+          1'000'000 /
+          (audio_file->get_header().get_rate() / MAX_SAMPLES_PER_LOOP));
       current_state = playing;
       break;
     case (AudioPlayerCommand::stop):
