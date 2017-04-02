@@ -18,6 +18,7 @@ enum AudioPlayerCommand {
   skip_to,
   kill_thread,
   query_state,
+  downsample
 };
 
 struct Message {
@@ -49,12 +50,15 @@ private:
 
   int current_song;
   AudioPlayerState current_state = stopped;
+  bool resample = false;
+  size_t new_rate = 0;
 
   void main_loop();
   bool execute_command();
   bool execute_loop();
   size_t current_sample_written = 0;
   std::chrono::microseconds elapsed_time = std::chrono::microseconds(0);
+  std::chrono::microseconds playing_elapsed_time = std::chrono::microseconds(0);
 
   bool is_dying = false;
 
@@ -68,6 +72,8 @@ public:
   void skip_to(int track_id);
   void kill();
   bool is_alive();
+  void downsample();
+  std::vector<AudioData> resample_data(std::vector<AudioData>);
 
   AudioPlayerState get_state();
 };

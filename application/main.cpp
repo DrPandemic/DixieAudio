@@ -1,4 +1,5 @@
 #include "../include/AudioPlayer.h"
+#include "../include/Minuter.h"
 #include "../include/PulseaudioDevice.h"
 #include "../include/WAVFile.h"
 #include <boost/chrono.hpp>
@@ -9,7 +10,6 @@
 #include <memory>
 #include <stdlib.h>
 #include <termios.h>
-#include "../include/Minuter.h"
 
 using namespace std;
 
@@ -35,25 +35,27 @@ int main() {
 
   while (player.is_alive()) {
 
-      char user_cmd = getchar();
+    char user_cmd = getchar();
 
-      switch (user_cmd) {
-      case 's':
-        player.resume();
-        break;
-      case 'p':
-        player.stop();
-        break;
-      case 'x':
-        player.kill();
-        break;
-      default:
-        cout << "Invalid command, the valid commands are:" << endl;
-        cout << "s : start" << endl;
-        cout << "p : pause" << endl;
-        cout << "x : kill" << endl;
-        break;
-      }
+    switch (user_cmd) {
+    case 's':
+      player.resume();
+      break;
+    case 'p':
+      player.stop();
+      break;
+    case 'x':
+      player.kill();
+      break;
+    case 'd':
+      player.downsample();
+      break;
+    default:
+      cout << user_cmd << ": Invalid command, the valid commands are:" << endl;
+      cout << "s : start" << endl;
+      cout << "p : pause" << endl;
+      cout << "x : kill" << endl;
+      break;
     }
-
+  }
 }

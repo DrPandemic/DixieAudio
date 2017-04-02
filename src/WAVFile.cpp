@@ -51,7 +51,7 @@ vector<AudioData> WAVFile::read_while(size_t nb_samples,
                                       chrono::microseconds max_micro) {
   auto start = system_clock::now();
   vector<AudioData> data;
-  int amount = header.bits_per_sample / sizeof(AudioData);
+  int amount = header.bits_per_sample / (sizeof(AudioData)* 8);
   data.reserve(nb_samples * amount);
   AudioData tmp;
   for (size_t i = 0;
