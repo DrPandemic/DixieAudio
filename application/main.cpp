@@ -33,7 +33,7 @@ int main() {
   stop_buffering();
 
   while (player.is_alive()) {
-    while (cin.rdbuf()->in_avail() > 0) {
+
       char user_cmd = getchar();
 
       switch (user_cmd) {
@@ -46,7 +46,13 @@ int main() {
       case 'x':
         player.kill();
         break;
+      default:
+        cout << "Invalid command, the valid commands are:" << endl;
+        cout << "s : start" << endl;
+        cout << "p : pause" << endl;
+        cout << "x : kill" << endl;
+        break;
       }
     }
-  }
+
 }
