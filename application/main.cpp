@@ -9,6 +9,7 @@
 #include <memory>
 #include <stdlib.h>
 #include <termios.h>
+#include "../include/Minuter.h"
 
 using namespace std;
 

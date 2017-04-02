@@ -10,9 +10,16 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
 void AudioPlayer::main_loop() {
   while (execute_command()) {
     if (current_state == AudioPlayerState::playing) {
-      auto data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP,
-                                         AudioPlayer::MAX_MS_PER_LOOP);
-      device->write(data);
+
+      vector<AudioData> data;
+      auto time = minuter([&data, this] {
+        data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP,
+                                      AudioPlayer::MAX_MS_PER_LOOP);
+      });
+      cout << "read: " << duration_cast<microseconds>(time).count() << endl;
+
+      time = minuter([&data, this] { device->write(data); });
+      cout << "write: " << duration_cast<microseconds>(time).count() << endl;
 
       if (audio_file->eof()) {
         audio_file->restart();

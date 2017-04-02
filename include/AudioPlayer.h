@@ -6,6 +6,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
+#include "../include/Minuter.h"
 
 enum AudioPlayerState { playing, stopped, paused };
 enum AudioPlayerCommand {
