@@ -11,8 +11,18 @@ void AudioPlayer::main_loop() {
   bool isAlive = true;
 
   while (isAlive) {
-    auto time = minuter([&isAlive, this] { isAlive = execute_loop(); });
-    // cout << time.count() << endl;
+     elapsed_time += duration_cast<microseconds>(minuter([&isAlive, this] { isAlive = execute_loop(); }));
+
+    if(audio_file)
+    {
+      auto sample_rate = audio_file->get_header().get_rate();
+      auto played_sample = (sample_rate * elapsed_time) / 1'000'000 ;
+      cout << played_sample.count() << endl;
+    }
+
+    //auto played_sample = (sample_rate * time);
+    //cout << "current sample written: " << current_sample_written  << ' '
+     //    << "current time elapsed: "<< time.count() << endl;
   }
 }
 
@@ -28,10 +38,13 @@ bool AudioPlayer::execute_loop() {
 
     vector<AudioData> data = audio_file->read_while(
         AudioPlayer::MAX_SAMPLES_PER_LOOP, micro_per_loop);
+    current_sample_written += 4;
     device->write(data);
 
     if (audio_file->eof()) {
       audio_file->restart();
+      elapsed_time = chrono::microseconds(0);
+      current_sample_written = 0;
     }
   }
   return playerIsAlive;
@@ -43,9 +56,11 @@ bool AudioPlayer::execute_command() {
     switch (message.command) {
     case (AudioPlayerCommand::start):
       cout << "ICIIII" << endl;
+        elapsed_time = chrono::microseconds(0);
+        current_sample_written = 0;
       audio_file = std::move(message.audio_file);
       buffer_sample =
-          BUFFER_MICROS.count() * audio_file->get_header().get_rate();
+          (BUFFER_MICROS.count()* audio_file->get_header().get_rate()) / 1'000'000;
       micro_per_loop = std::chrono::microseconds(
           1'000'000 /
           (audio_file->get_header().get_rate() / MAX_SAMPLES_PER_LOOP));

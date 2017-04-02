@@ -5,6 +5,7 @@
 #include <istream>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 using namespace std::chrono;
 
@@ -28,7 +29,7 @@ public:
       : file_stream{std::move(file_stream)} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
   virtual std::vector<AudioData> read_while(size_t nb_samples,
-                                            duration_t max_duration) = 0;
+                                            std::chrono::microseconds max_duration) = 0;
   virtual std::vector<AudioData> read_all() = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};

@@ -41,7 +41,7 @@ private:
   boost::sync_queue<Message> message_queue;
   boost::sync_queue<Response> response_queue;
   boost::thread main_thread;
-  size_t buffer_sample;
+  double buffer_sample;
   std::chrono::microseconds micro_per_loop;
 
   static const size_t MAX_SAMPLES_PER_LOOP = 4;
@@ -53,6 +53,8 @@ private:
   void main_loop();
   bool execute_command();
   bool execute_loop();
+  size_t current_sample_written = 0;
+  std::chrono::microseconds elapsed_time = std::chrono::microseconds(0);
 
   bool is_dying = false;
 
