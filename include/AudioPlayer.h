@@ -41,15 +41,18 @@ private:
   boost::sync_queue<Message> message_queue;
   boost::sync_queue<Response> response_queue;
   boost::thread main_thread;
+  size_t buffer_sample;
+  std::chrono::microseconds micro_per_loop;
 
   static const size_t MAX_SAMPLES_PER_LOOP = 4;
-  constexpr static const duration_t MAX_MS_PER_LOOP = duration_t(100);
+  constexpr static const std::chrono::microseconds BUFFER_MICROS = std::chrono::microseconds(100000);
 
   int current_song;
   AudioPlayerState current_state = stopped;
 
   void main_loop();
   bool execute_command();
+  bool execute_loop();
 
   bool is_dying = false;
 

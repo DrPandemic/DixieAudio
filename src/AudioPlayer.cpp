@@ -2,39 +2,54 @@
 
 using namespace std;
 
-constexpr const duration_t AudioPlayer::MAX_MS_PER_LOOP;
+constexpr const chrono::microseconds AudioPlayer::BUFFER_MICROS;
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {}
 
 void AudioPlayer::main_loop() {
   while (execute_command()) {
-    if (current_state == AudioPlayerState::playing) {
-
-      vector<AudioData> data;
-      auto time = minuter([&data, this] {
-        data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP,
-                                      AudioPlayer::MAX_MS_PER_LOOP);
-      });
-      cout << "read: " << duration_cast<microseconds>(time).count() << endl;
-
-      time = minuter([&data, this] { device->write(data); });
-      cout << "write: " << duration_cast<microseconds>(time).count() << endl;
-
-      if (audio_file->eof()) {
-        audio_file->restart();
-      }
-    }
+    bool isAlive = true;
+    auto time = minuter([&isAlive, this] { isAlive = execute_loop(); });
+    // cout << time.count() << endl;
   }
 }
 
+bool AudioPlayer::execute_loop() {
+
+  bool playerIsAlive = execute_command();
+
+  if (!playerIsAlive) {
+    return false;
+  }
+
+  if (current_state == AudioPlayerState::playing) {
+
+    vector<AudioData> data = audio_file->read_while(
+        AudioPlayer::MAX_SAMPLES_PER_LOOP, micro_per_loop);
+    device->write(data);
+
+    if (audio_file->eof()) {
+      audio_file->restart();
+    }
+  }
+  return playerIsAlive;
+}
 bool AudioPlayer::execute_command() {
   if (!message_queue.empty()) {
     auto message = message_queue.pull();
 
     switch (message.command) {
     case (AudioPlayerCommand::start):
+      cout << "ICIIII" << endl;
       audio_file = std::move(message.audio_file);
+      buffer_sample =
+          BUFFER_MICROS.count() * audio_file->get_header().get_rate();
+      micro_per_loop = std::chrono::microseconds(
+          1'000'000 / audio_file->get_header().get_rate() /
+          MAX_SAMPLES_PER_LOOP);
+        cout << "yolo" << buffer_sample << endl;
+        cout << micro_per_loop.count() << endl;
       current_state = playing;
       break;
     case (AudioPlayerCommand::stop):
