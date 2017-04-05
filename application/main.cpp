@@ -23,18 +23,31 @@ void stop_buffering() {
   cin.sync_with_stdio(false);
 }
 
+void display_ui(const WAVHeader &header) {
+  cout << "Keys:" << endl;
+  cout << "   s: start" << endl;
+  cout << "   p: pause" << endl;
+  cout << "   x: kill" << endl;
+  cout << "   d: downsample" << endl << endl;
+  cout << "File Information:" << endl;
+  cout << "Number of channels: " << header.number_of_channels << endl;
+  cout << "Sample rate: " << header.sample_rate << " Hz" << endl;
+  cout << "Data size: " << header.data_size << " bytes" << endl;
+}
+
 int main() {
   auto s = make_unique<ifstream>("../music/mario_09.wav",
                                  ifstream::in | std::ios::binary);
   auto f = make_unique<WAVFile>(move(s));
   unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
+  auto header = f->get_header();
   AudioPlayer player{move(device)};
   player.start(std::move(f));
 
   stop_buffering();
+  display_ui(header);
 
   while (player.is_alive()) {
-
     char user_cmd = getchar();
 
     switch (user_cmd) {
@@ -49,12 +62,6 @@ int main() {
       break;
     case 'd':
       player.downsample();
-      break;
-    default:
-      cout << user_cmd << ": Invalid command, the valid commands are:" << endl;
-      cout << "s : start" << endl;
-      cout << "p : pause" << endl;
-      cout << "x : kill" << endl;
       break;
     }
   }
