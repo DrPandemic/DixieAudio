@@ -7,7 +7,19 @@ using namespace boost::chrono;
 constexpr const us_t AudioPlayer::BUFFER_US;
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
-    : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {}
+    : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {
+  init();
+}
+
+void AudioPlayer::init() {
+  current_sample_written = 0;
+  elapsed_time = us_t(0);
+  nb_execution = 1;
+  playing_elapsed_time = us_t(0);
+  write_us = us_t(0);
+  resample_us = us_t(0);
+  saved_timed_of_first_write = false;
+}
 
 void AudioPlayer::main_loop() {
   bool isAlive = true;
@@ -119,6 +131,8 @@ bool AudioPlayer::execute_command() {
       if (current_state == paused) {
         elapsed_time = playing_elapsed_time;
         current_state = playing;
+
+        init();
       }
       break;
     case (AudioPlayerCommand::next):

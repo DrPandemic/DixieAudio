@@ -56,22 +56,23 @@ private:
   bool execute_command();
   bool execute_loop();
 
-  size_t current_sample_written = 0;
-  us_t elapsed_time = us_t(0);
-  size_t nb_execution = 0;
-  us_t playing_elapsed_time = us_t(0);
-  us_t write_us = us_t(0);
-  us_t resample_us = us_t(0);
+  size_t current_sample_written;
+  us_t elapsed_time;
+  size_t nb_execution;
+  us_t playing_elapsed_time;
+  us_t write_us;
+  us_t resample_us;
 
   // buffering
   time_point_t time_of_first_write;
-  bool saved_timed_of_first_write = false;
+  bool saved_timed_of_first_write;
   constexpr static const us_t BUFFER_US = us_t(10000);
 
   bool is_dying = false;
 
 public:
   AudioPlayer(std::unique_ptr<AudioDevice>);
+  void init();
   void start(std::unique_ptr<AudioFile> audio_file);
   void stop();
   void resume();
