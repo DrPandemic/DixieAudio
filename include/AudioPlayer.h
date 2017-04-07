@@ -4,6 +4,7 @@
 #include "../include/Minuter.h"
 #include "AudioDevice.h"
 #include "WAVFile.h"
+#include <boost/chrono.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
@@ -42,12 +43,9 @@ private:
   boost::sync_queue<Message> message_queue;
   boost::sync_queue<Response> response_queue;
   boost::thread main_thread;
-  double buffer_sample;
-  std::chrono::microseconds micro_per_loop;
+  boost::chrono::microseconds micro_per_loop;
 
   static const size_t MAX_SAMPLES_PER_LOOP = 4;
-  constexpr static const std::chrono::microseconds BUFFER_MICROS =
-      std::chrono::microseconds(100000);
 
   int current_song;
   AudioPlayerState current_state = stopped;
@@ -59,11 +57,16 @@ private:
   bool execute_loop();
 
   size_t current_sample_written = 0;
-  std::chrono::microseconds elapsed_time = std::chrono::microseconds(0);
+  us_t elapsed_time = us_t(0);
   size_t nb_execution = 0;
-  std::chrono::microseconds playing_elapsed_time = std::chrono::microseconds(0);
-  std::chrono::microseconds write_us = std::chrono::microseconds(0);
-  std::chrono::microseconds resample_us = std::chrono::microseconds(0);
+  us_t playing_elapsed_time = us_t(0);
+  us_t write_us = us_t(0);
+  us_t resample_us = us_t(0);
+
+  // buffering
+  time_point_t time_of_first_write;
+  bool saved_timed_of_first_write = false;
+  constexpr static const us_t BUFFER_US = us_t(10000);
 
   bool is_dying = false;
 

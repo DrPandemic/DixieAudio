@@ -4,6 +4,7 @@
 #include <iterator>
 
 using namespace std;
+using namespace boost::chrono;
 
 template <class destination> void read(istream &fs, destination &dest) {
   fs.read(reinterpret_cast<char *>(&dest), sizeof(dest));
@@ -47,16 +48,15 @@ vector<AudioData> WAVFile::read(size_t nb_bytes) {
   return data;
 }
 
-vector<AudioData> WAVFile::read_while(size_t nb_samples,
-                                      chrono::microseconds max_micro) {
+vector<AudioData> WAVFile::read_while(size_t nb_samples, us_t max_micro) {
   auto start = system_clock::now();
   vector<AudioData> data;
-  int amount = header.bits_per_sample / (sizeof(AudioData)* 8);
+  int amount = header.bits_per_sample / (sizeof(AudioData) * 8);
   data.reserve(nb_samples * amount);
   AudioData tmp;
   for (size_t i = 0;
        file_stream->good() && i < nb_samples &&
-       duration_cast<microseconds>(system_clock::now() - start) < max_micro;
+       duration_cast<us_t>(system_clock::now() - start) < max_micro;
        ++i) {
     for (int j = 0; j < amount && file_stream->good(); ++j) {
       file_stream->read(&tmp, 1);

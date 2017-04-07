@@ -1,16 +1,15 @@
 #ifndef DIXIEAUDIO_AUDIO_FILE_H
 #define DIXIEAUDIO_AUDIO_FILE_H
 
-#include <chrono>
+#include <boost/chrono.hpp>
 #include <istream>
 #include <memory>
 #include <vector>
-#include <chrono>
-
-using namespace std::chrono;
 
 using AudioData = char;
-using duration_t = system_clock::duration;
+using duration_t = boost::chrono::system_clock::duration;
+using time_point_t = boost::chrono::system_clock::time_point;
+using us_t = boost::chrono::microseconds;
 
 struct AudioHeader {
   virtual unsigned int get_rate() const = 0;
@@ -18,6 +17,7 @@ struct AudioHeader {
   AudioHeader(){};
   virtual bool is_valid() const = 0;
   virtual size_t get_header_size() const = 0;
+  virtual size_t get_sample_size() const = 0;
 };
 
 class AudioFile {
@@ -29,7 +29,7 @@ public:
       : file_stream{std::move(file_stream)} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
   virtual std::vector<AudioData> read_while(size_t nb_samples,
-                                            std::chrono::microseconds max_duration) = 0;
+                                            us_t max_duration) = 0;
   virtual std::vector<AudioData> read_all() = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};

@@ -2,10 +2,10 @@
 #define DIXIEAUDIO_NSF_FILE_H
 
 #include "AudioFile.h"
+#include <chrono>
 #include <istream>
 #include <memory>
 #include <vector>
-#include <chrono>
 
 enum NSFType { NTSC = 0, PAL = 1, DUAL = 2 };
 
@@ -63,6 +63,7 @@ struct NSFHeader : public AudioHeader {
   unsigned int get_rate() const override;
   bool is_valid() const override { return false; }
   size_t get_header_size() const override { return 10; }
+  size_t get_sample_size() const override { return 8; }
 };
 
 class NSFFile : public AudioFile {
@@ -73,7 +74,7 @@ public:
   NSFFile(std::unique_ptr<std::istream> file_stream);
   std::vector<AudioData> read(size_t nb_bytes) override;
   std::vector<AudioData> read_all() override { return {}; };
-  std::vector<AudioData> read_while(size_t, std::chrono::microseconds) override { return {}; };
+  std::vector<AudioData> read_while(size_t, us_t) override { return {}; };
   const NSFHeader &get_header() const override;
   ~NSFFile() override;
 };

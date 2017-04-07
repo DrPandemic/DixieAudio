@@ -2,9 +2,9 @@
 #include <algorithm>
 
 using namespace std;
-using namespace std::chrono;
+using namespace boost::chrono;
 
-constexpr const chrono::microseconds AudioPlayer::BUFFER_MICROS;
+constexpr const us_t AudioPlayer::BUFFER_US;
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {}
@@ -13,15 +13,36 @@ void AudioPlayer::main_loop() {
   bool isAlive = true;
 
   while (isAlive) {
-    elapsed_time += duration_cast<microseconds>(minuter([&isAlive, this] {
+    elapsed_time += duration_cast<us_t>(minuter([&isAlive, this] {
       isAlive = execute_loop();
       ++nb_execution;
     }));
+
+    if (current_state == AudioPlayerState::playing) {
+      us_t real_elapsed =
+          duration_cast<us_t>(system_clock::now() - time_of_first_write);
+      double sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
+      auto estimated_buffer_size =
+          (current_sample_written - (real_elapsed.count() * sample_rate_us));
+      auto wanted_buffer_size = BUFFER_US.count() * sample_rate_us;
+
+      cout << "current sample written " << current_sample_written << endl;
+      cout << "estimated sample played "
+           << real_elapsed.count() * sample_rate_us << endl;
+      cout << "estimated buffered " << estimated_buffer_size << endl;
+      cout << "wanted buffer size " << wanted_buffer_size << endl;
+
+      if (estimated_buffer_size > wanted_buffer_size) {
+        // boost::this_thread::sleep_for(us_t());
+        cout << "Should not buffer..." << endl;
+      } else {
+        cout << "Buffering..." << endl;
+      }
+    }
   }
 }
 
 bool AudioPlayer::execute_loop() {
-
   bool playerIsAlive = execute_command();
 
   if (!playerIsAlive) {
@@ -30,12 +51,12 @@ bool AudioPlayer::execute_loop() {
 
   if (current_state == AudioPlayerState::playing) {
     // this need to be changed
-    microseconds read_us =
+    us_t read_us =
         micro_per_loop - resample_us - write_us - (elapsed_time / nb_execution);
-    read_us = read_us < microseconds(0) ? microseconds(0) : read_us;
+    read_us = read_us < us_t(0) ? us_t(0) : read_us;
 
     cout << "loop allowed us " << micro_per_loop.count() << endl;
-    cout << "read us " << read_us.count() << endl;
+    cout << "read allowed us " << read_us.count() << endl;
     cout << "resample us " << resample_us.count() << endl;
     cout << "write us " << write_us.count() << endl;
     cout << "loop us " << (elapsed_time / nb_execution).count() << endl;
@@ -45,7 +66,7 @@ bool AudioPlayer::execute_loop() {
         audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
 
     if (resample) {
-      resample_us += duration_cast<microseconds>(minuter([this, &data] {
+      resample_us += duration_cast<us_t>(minuter([this, &data] {
         cout << "before" << data[0] << endl;
         data = resample_data(data);
         cout << "after" << data[0] << endl;
@@ -53,20 +74,23 @@ bool AudioPlayer::execute_loop() {
       resample_us /= 2;
     }
 
-    write_us += duration_cast<microseconds>(
-        minuter([this, &data] { device->write(data); }));
+    write_us += duration_cast<us_t>(minuter([this, &data] {
+      device->write(data);
+      if (!saved_timed_of_first_write) {
+        time_of_first_write = system_clock::now();
+        saved_timed_of_first_write = true;
+      }
+    }));
     // could use a better function
     write_us /= 2;
 
     // data.size() is the number of char. So, nb_chars * 8 = nb_bits.
     // nb_bits / sample_rate = nb_samples
     current_sample_written +=
-        (data.size() * 8 / audio_file->get_header().get_rate());
+        (data.size() * 8 / audio_file->get_header().get_sample_size());
 
     if (audio_file->eof()) {
       audio_file->restart();
-      elapsed_time = chrono::microseconds(0);
-      current_sample_written = 0;
     }
   }
   return playerIsAlive;
@@ -77,15 +101,11 @@ bool AudioPlayer::execute_command() {
 
     switch (message.command) {
     case (AudioPlayerCommand::start):
-      elapsed_time = chrono::microseconds(0);
+      elapsed_time = us_t(0);
       current_sample_written = 0;
       audio_file = std::move(message.audio_file);
-      buffer_sample =
-          (BUFFER_MICROS.count() * audio_file->get_header().get_rate()) /
-          1'000'000;
-      micro_per_loop = std::chrono::microseconds(
-          1'000'000 /
-          (audio_file->get_header().get_rate() / MAX_SAMPLES_PER_LOOP));
+      micro_per_loop = us_t(1'000'000 / (audio_file->get_header().get_rate() /
+                                         MAX_SAMPLES_PER_LOOP));
       new_rate = audio_file->get_header().get_rate();
       current_state = playing;
       break;
