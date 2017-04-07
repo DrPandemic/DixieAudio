@@ -33,8 +33,8 @@ void AudioPlayer::main_loop() {
       cout << "wanted buffer size " << wanted_buffer_size << endl;
 
       if (estimated_buffer_size > wanted_buffer_size) {
-        // boost::this_thread::sleep_for(us_t());
-        cout << "Should not buffer..." << endl;
+        boost::this_thread::sleep_for(
+            us_t(micro_per_loop - (elapsed_time / nb_execution)));
       } else {
         cout << "Buffering..." << endl;
       }
