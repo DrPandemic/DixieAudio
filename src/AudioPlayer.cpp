@@ -1,6 +1,8 @@
 #include "../include/AudioPlayer.h"
+#include <algorithm>
 
 using namespace std;
+using namespace std::chrono;
 
 constexpr const chrono::microseconds AudioPlayer::BUFFER_MICROS;
 
@@ -11,20 +13,10 @@ void AudioPlayer::main_loop() {
   bool isAlive = true;
 
   while (isAlive) {
-    elapsed_time += duration_cast<microseconds>(
-        minuter([&isAlive, this] { isAlive = execute_loop(); }));
-    // cout << "ELAPSED time: " << elapsed_time.count() << endl;
-
-    if (audio_file and current_state == playing) {
-
-      auto sample_rate = audio_file->get_header().get_rate();
-      auto played_sample = (sample_rate * elapsed_time) / 1'000'000;
-
-      // cout << "Playing Ellapsed Time" << playing_elapsed_time.count();
-      // cout << "elapsed time: " << elapsed_time.count() << endl;
-      // cout << " number of sample played: (theorically) " <<
-      // played_sample.count() << endl;
-    }
+    elapsed_time += duration_cast<microseconds>(minuter([&isAlive, this] {
+      isAlive = execute_loop();
+      ++nb_execution;
+    }));
   }
 }
 
@@ -37,18 +29,39 @@ bool AudioPlayer::execute_loop() {
   }
 
   if (current_state == AudioPlayerState::playing) {
+    // this need to be changed
+    microseconds read_us =
+        micro_per_loop - resample_us - write_us - (elapsed_time / nb_execution);
+    read_us = read_us < microseconds(0) ? microseconds(0) : read_us;
 
-    vector<AudioData> data = audio_file->read_while(
-        AudioPlayer::MAX_SAMPLES_PER_LOOP, micro_per_loop);
+    cout << "loop allowed us " << micro_per_loop.count() << endl;
+    cout << "read us " << read_us.count() << endl;
+    cout << "resample us " << resample_us.count() << endl;
+    cout << "write us " << write_us.count() << endl;
+    cout << "loop us " << (elapsed_time / nb_execution).count() << endl;
+    cout << endl;
+
+    vector<AudioData> data =
+        audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
 
     if (resample) {
-      cout << "before" << data[0] << endl;
-      data = resample_data(data);
-      cout << "after" << data[0] << endl;
+      resample_us += duration_cast<microseconds>(minuter([this, &data] {
+        cout << "before" << data[0] << endl;
+        data = resample_data(data);
+        cout << "after" << data[0] << endl;
+      }));
+      resample_us /= 2;
     }
 
-    current_sample_written += 4;
-    device->write(data);
+    write_us += duration_cast<microseconds>(
+        minuter([this, &data] { device->write(data); }));
+    // could use a better function
+    write_us /= 2;
+
+    // data.size() is the number of char. So, nb_chars * 8 = nb_bits.
+    // nb_bits / sample_rate = nb_samples
+    current_sample_written +=
+        (data.size() * 8 / audio_file->get_header().get_rate());
 
     if (audio_file->eof()) {
       audio_file->restart();
@@ -172,25 +185,25 @@ std::vector<AudioData> AudioPlayer::resample_data(std::vector<AudioData> data) {
   std::vector<AudioData> newData;
   newData.resize(4);
 
-  for (int i = 0; i < newData.size()/2; i ++) {
-    first_number[i] = data[i*4];
-    first_number[i + 1] = data[i*4 + 1];
-    second_number[i] = data[i*4 + 2];
-    second_number[i + 1] = data[i*4 + 3];
+  for (int i = 0; i < newData.size() / 2; i++) {
+    first_number[i] = data[i * 4];
+    first_number[i + 1] = data[i * 4 + 1];
+    second_number[i] = data[i * 4 + 2];
+    second_number[i + 1] = data[i * 4 + 3];
 
-    uint16_t f_num = *((int*) first_number);
-    uint16_t s_num = *((int*) second_number);
+    uint16_t f_num = *((int *)first_number);
+    uint16_t s_num = *((int *)second_number);
     cout << "f_num " << endl;
-    cout << f_num  << endl;
+    cout << f_num << endl;
     cout << "s_num " << endl;
     cout << s_num << endl;
 
     uint16_t interp = (f_num + s_num) / 2;
 
-    //TODO figure how to retrieve two char from this int representation.
+    // TODO figure how to retrieve two char from this int representation.
 
-   // newData[i*2] = c[0];
-   // newData[i*2 + 1] = c[1];
+    // newData[i*2] = c[0];
+    // newData[i*2 + 1] = c[1];
     // cout << newData[i] << endl;
   }
   return newData;

@@ -1,12 +1,12 @@
 #ifndef DIXIEAUDIO_AUDIO_PLAYER_H
 #define DIXIEAUDIO_AUDIO_PLAYER_H
 
+#include "../include/Minuter.h"
 #include "AudioDevice.h"
 #include "WAVFile.h"
 #include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
-#include "../include/Minuter.h"
 
 enum AudioPlayerState { playing, stopped, paused };
 enum AudioPlayerCommand {
@@ -46,7 +46,8 @@ private:
   std::chrono::microseconds micro_per_loop;
 
   static const size_t MAX_SAMPLES_PER_LOOP = 4;
-  constexpr static const std::chrono::microseconds BUFFER_MICROS = std::chrono::microseconds(100000);
+  constexpr static const std::chrono::microseconds BUFFER_MICROS =
+      std::chrono::microseconds(100000);
 
   int current_song;
   AudioPlayerState current_state = stopped;
@@ -56,9 +57,13 @@ private:
   void main_loop();
   bool execute_command();
   bool execute_loop();
+
   size_t current_sample_written = 0;
   std::chrono::microseconds elapsed_time = std::chrono::microseconds(0);
+  size_t nb_execution = 0;
   std::chrono::microseconds playing_elapsed_time = std::chrono::microseconds(0);
+  std::chrono::microseconds write_us = std::chrono::microseconds(0);
+  std::chrono::microseconds resample_us = std::chrono::microseconds(0);
 
   bool is_dying = false;
 
