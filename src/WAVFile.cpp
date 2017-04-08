@@ -1,8 +1,5 @@
 #include "../include/WAVFile.h"
 
-#include <iostream>
-#include <iterator>
-
 using namespace std;
 using namespace boost::chrono;
 
