@@ -1,15 +1,6 @@
 #include "../include/AudioPlayer.h"
-#include "../include/Minuter.h"
 #include "../include/PulseaudioDevice.h"
-#include "../include/WAVFile.h"
-#include <boost/chrono.hpp>
-#include <boost/lockfree/queue.hpp>
-#include <cstdlib>
 #include <fstream>
-#include <iostream>
-#include <memory>
-#include <stdlib.h>
-#include <string>
 #include <termios.h>
 
 using namespace std;
@@ -33,6 +24,7 @@ void display_ui(const WAVHeader &header) {
   cout << "File Information:" << endl;
   cout << "Number of channels: " << header.number_of_channels << endl;
   cout << "Sample rate: " << header.sample_rate << " Hz" << endl;
+  cout << "Bits per sample: " << header.bits_per_sample << " bits" << endl;
   cout << "Data size: " << header.data_size << " bytes" << endl;
 }
 
@@ -50,36 +42,43 @@ int main(int argc, char *argv[]) {
     auto f = make_unique<WAVFile>(move(s));
     unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
     auto header = f->get_header();
-    AudioPlayer player{move(device)};
-    player.start(std::move(f));
 
-    stop_buffering();
-    display_ui(header);
+    // only supporting 16 bits for now
+    if (header.bits_per_sample == 16) {
+      AudioPlayer player{move(device)};
+      player.start(std::move(f));
 
-    while (player.is_alive()) {
-      char user_cmd = getchar();
+      stop_buffering();
+      display_ui(header);
 
-      switch (user_cmd) {
-      case 's':
-        player.resume();
-        break;
-      case 'p':
-        player.stop();
-        break;
-      case 'x':
-        player.kill();
-        break;
-      case 'd':
-        player.downsample();
-        break;
-      default:
-        cout << "\n"
-             << "Valid commands are : " << endl;
-        cout << "p : pause" << endl;
-        cout << "s : resume" << endl;
-        cout << "x : stop" << endl;
-        break;
+      while (player.is_alive()) {
+        char user_cmd = getchar();
+
+        switch (user_cmd) {
+        case 's':
+          player.resume();
+          break;
+        case 'p':
+          player.stop();
+          break;
+        case 'x':
+          player.kill();
+          break;
+        case 'd':
+          player.downsample();
+          break;
+        default:
+          cout << "\n"
+               << "Valid commands are : " << endl;
+          cout << "p : pause" << endl;
+          cout << "s : resume" << endl;
+          cout << "x : stop" << endl;
+          break;
+        }
       }
+    } else {
+      cout << "Sorry we only support 16bits for now " << endl;
+      return EXIT_FAILURE;
     }
   } else {
     cout << file_path << " is invalid " << endl;
