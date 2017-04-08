@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <stdlib.h>
+#include <string>
 #include <termios.h>
 
 using namespace std;
@@ -35,34 +36,53 @@ void display_ui(const WAVHeader &header) {
   cout << "Data size: " << header.data_size << " bytes" << endl;
 }
 
-int main() {
-  auto s = make_unique<ifstream>("../music/mario_09.wav",
-                                 ifstream::in | std::ios::binary);
-  auto f = make_unique<WAVFile>(move(s));
-  unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
-  auto header = f->get_header();
-  AudioPlayer player{move(device)};
-  player.start(std::move(f));
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    cout << "Usage: " << argv[0] << " <WAV_file_path>" << endl;
+    return EXIT_FAILURE;
+  }
 
-  stop_buffering();
-  display_ui(header);
+  string file_path(argv[1]);
+  auto s = make_unique<ifstream>(file_path, ifstream::in | std::ios::binary);
 
-  while (player.is_alive()) {
-    char user_cmd = getchar();
+  // if the file is open, we can start to play
+  if (s->is_open()) {
+    auto f = make_unique<WAVFile>(move(s));
+    unique_ptr<AudioDevice> device = make_unique<PulseaudioDevice>();
+    auto header = f->get_header();
+    AudioPlayer player{move(device)};
+    player.start(std::move(f));
 
-    switch (user_cmd) {
-    case 's':
-      player.resume();
-      break;
-    case 'p':
-      player.stop();
-      break;
-    case 'x':
-      player.kill();
-      break;
-    case 'd':
-      player.downsample();
-      break;
+    stop_buffering();
+    display_ui(header);
+
+    while (player.is_alive()) {
+      char user_cmd = getchar();
+
+      switch (user_cmd) {
+      case 's':
+        player.resume();
+        break;
+      case 'p':
+        player.stop();
+        break;
+      case 'x':
+        player.kill();
+        break;
+      case 'd':
+        player.downsample();
+        break;
+      default:
+        cout << "\n"
+             << "Valid commands are : " << endl;
+        cout << "p : pause" << endl;
+        cout << "s : resume" << endl;
+        cout << "x : stop" << endl;
+        break;
+      }
     }
+  } else {
+    cout << file_path << " is invalid " << endl;
+    return EXIT_FAILURE;
   }
 }
