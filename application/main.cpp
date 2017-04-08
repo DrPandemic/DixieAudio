@@ -19,7 +19,7 @@ void display_ui(const WAVHeader &header) {
   cout << "Keys:" << endl;
   cout << "   s: start" << endl;
   cout << "   p: pause" << endl;
-  cout << "   x: kill" << endl;
+  cout << "   x: stop" << endl;
   cout << "   d: downsample" << endl << endl;
   cout << "File Information:" << endl;
   cout << "Number of channels: " << header.number_of_channels << endl;
