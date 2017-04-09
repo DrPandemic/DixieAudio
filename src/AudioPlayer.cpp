@@ -68,28 +68,36 @@ void AudioPlayer::main_loop() {
 
 void AudioPlayer::log_to_file() {
   int max_total = -1;
+  int avg_total = 0;
   for (auto u: complete_loop_time){
+    avg_total+=u.count();
     if(u.count()> max_total){
       max_total = u.count();
     }
   }
 
   int max_read = -1;
+  int avg_read = 0;
   for (auto u: read_time){
+    avg_read+=u.count();
     if(u.count()> max_read){
       max_read = u.count();
     }
   }
 
   int max_write = -1;
+  int avg_write =0;
   for (auto u: write_time){
+    avg_write += u.count();
     if(u.count()> max_write){
       max_write = u.count();
     }
   }
 
   int max_sleep = -1;
+  int avg_sleep = 0;
   for (auto u: sleep_time){
+    avg_sleep+=u.count();
     if(abs(u.count())> max_sleep){
       max_sleep = abs(u.count());
     }
@@ -99,6 +107,10 @@ void AudioPlayer::log_to_file() {
   log_file << "Max write time = " << max_write << " us\n";
   log_file << "Max sleep time = " << max_sleep << " us\n";
   log_file << "Max loop time = " << max_total << " us\n";
+  log_file << "avg read time = " << avg_read/read_time.size() << " us\n";
+  log_file << "avg write time = " << avg_write/write_time.size() << " us\n";
+  log_file << "avg sleep time = " << avg_sleep/sleep_time.size() << " us\n";
+  log_file << "avg loop time = " << avg_total/complete_loop_time.size() << " us\n";
 
 }
 
