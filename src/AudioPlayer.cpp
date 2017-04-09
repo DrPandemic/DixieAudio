@@ -60,32 +60,30 @@ void AudioPlayer::main_loop() {
 }
 
 void AudioPlayer::log_to_file() {
-  int max = -1;
+  int max_total = -1;
   for (auto u: complete_loop_time){
-    if(u.count()> max){
-      max = u.count();
+    if(u.count()> max_total){
+      max_total = u.count();
     }
   }
 
-  log_file << "Max loop time = " << max << " us\n";
-
-  max = -1;
+  int max_read = -1;
   for (auto u: read_time){
-    if(u.count()> max){
-      max = u.count();
+    if(u.count()> max_read){
+      max_read = u.count();
     }
   }
 
-  log_file << "Max read time = " << max << " us\n";
-
-  max = -1;
+  int max_write = -1;
   for (auto u: write_time){
-    if(u.count()> max){
-      max = u.count();
+    if(u.count()> max_write){
+      max_write = u.count();
     }
   }
 
-  log_file << "Max write time = " << max << " us\n";
+  log_file << "Max read time = " << max_read << " us\n";
+  log_file << "Max loop time = " << max_total << " us\n";
+  log_file << "Max write time = " << max_write << " us\n";
 
 }
 
@@ -120,7 +118,7 @@ bool AudioPlayer::execute_loop() {
     // could use a better function
     timing.write_us /= 2;
 
-    write_time.push_back(timing_info.write_us);
+    write_time.push_back(timing.write_us);
 
     // data.size() is the number of char. So, nb_chars * 8 = nb_bits.
     // nb_bits / sample_rate = nb_samples

@@ -70,7 +70,6 @@ private:
   std::vector<us_t> read_time;
   std::vector<us_t> write_time;
   std::vector<us_t> complete_loop_time;
-  AudioPlayerTimingInfo timing_info;
   AudioPlayerTimingInfo timing;
 
   void main_loop();
