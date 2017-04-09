@@ -80,11 +80,12 @@ private:
   // buffering
   time_point_t time_of_first_write;
   bool saved_timed_of_first_write;
-  constexpr static const us_t BUFFER_US = us_t(10000);
 
   bool is_dying = false;
 
 public:
+  constexpr static const us_t BUFFER_US = us_t(10000);
+
   AudioPlayer(std::unique_ptr<AudioDevice>);
   void init();
   void start(std::unique_ptr<AudioFile> audio_file);

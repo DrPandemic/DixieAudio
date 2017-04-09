@@ -158,6 +158,8 @@ bool AudioPlayer::execute_command() {
     case (AudioPlayerCommand::query_timing_info):
       Response r;
       AudioPlayerTimingInfo t;
+      cout << "yeh" << endl;
+      cout << current_sample_written << endl;
       t.current_sample_written = current_sample_written;
       t.elapsed_time = elapsed_time;
       t.nb_execution = nb_execution;
@@ -165,7 +167,7 @@ bool AudioPlayer::execute_command() {
       t.resample_us = resample_us;
       t.write_us = write_us;
       t.time_elapsed_since_first_write = time_elapsed_since_first_write;
-      t.sample_rate_us =  audio_file->get_header().get_rate() / 1'000'000.;
+      t.sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
       r.audio_player_timing_info = t;
       response_queue.push(r);
       break;

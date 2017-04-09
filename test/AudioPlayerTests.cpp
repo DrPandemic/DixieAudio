@@ -3,8 +3,8 @@
 #include "NSFFile.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include <memory>
 #include <cstdlib>
+#include <memory>
 
 using namespace std;
 using namespace ::testing;
@@ -15,7 +15,7 @@ auto get_file() {
                           0x41, 0x56, 0x45, 0x66, 0x6D, 0x74, 0x20, 0x10, 0x00,
                           0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x11, 0x2B, 0x00,
                           0x00, 0x22, 0x56, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
-                          0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00};
+                          0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00, 0x00};
 
   auto ss =
       make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
@@ -60,8 +60,8 @@ TEST(player_test, can_resume) {
   player.kill();
 }
 
-
 TEST(player_test, timing) {
+  // player instantiation
   auto device_ptr = new StrictMock<MockAudioDevice>{};
   EXPECT_CALL(*device_ptr, reset_device(_)).WillOnce(Return());
   EXPECT_CALL(*device_ptr, write(_)).WillRepeatedly(Return(1));
@@ -70,15 +70,16 @@ TEST(player_test, timing) {
   auto file = get_file();
 
   player.start(std::move(file));
-  ::sleep(2);
+  ::sleep(1);
   AudioPlayerTimingInfo t = player.get_timing_info();
-  auto sample_played_estimation = t.time_elapsed_since_first_write.count() * t.sample_rate_us;
+  auto sample_played_estimation =
+      t.time_elapsed_since_first_write.count() * t.sample_rate_us;
 
-  auto diff = abs(sample_played_estimation - t.current_sample_written);
-cout << sample_played_estimation << endl;
-  cout << t.current_sample_written << endl;
-    cout << diff << endl;
-  ASSERT_LE(3, 4);
+  auto diff_written_sample =
+      abs(sample_played_estimation - t.current_sample_written);
+  auto wanted_buffer_size = AudioPlayer::BUFFER_US.count() * t.sample_rate_us;
+
+  ASSERT_LE(diff_written_sample, wanted_buffer_size + 8);
 
   player.kill();
 }
