@@ -1,6 +1,7 @@
 #include "../include/AudioPlayer.h"
 #include <random>
 
+
 using namespace std;
 using namespace boost::chrono;
 using namespace boost::this_thread;
@@ -15,6 +16,7 @@ const int MAX_ARTIFICIAL_LAG = 400;
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {
   init();
+  log_file.open ("data.txt");
 }
 
 void AudioPlayer::init() {
@@ -30,10 +32,12 @@ void AudioPlayer::main_loop() {
   bool isAlive = true;
 
   while (isAlive) {
-    timing.elapsed_time += duration_cast<us_t>(minuter([&isAlive, this] {
+    auto loop_time = duration_cast<us_t>(minuter([&isAlive, this] {
       isAlive = execute_loop();
       ++timing.nb_execution;
     }));
+    complete_loop_time.push_back(loop_time);
+    timing.elapsed_time += loop_time;
 
     if (current_state == AudioPlayerState::playing) {
       timing.time_elapsed_since_first_write =
@@ -50,6 +54,39 @@ void AudioPlayer::main_loop() {
       }
     }
   }
+
+  log_to_file();
+  log_file.close();
+}
+
+void AudioPlayer::log_to_file() {
+  int max = -1;
+  for (auto u: complete_loop_time){
+    if(u.count()> max){
+      max = u.count();
+    }
+  }
+
+  log_file << "Max loop time = " << max << " us\n";
+
+  max = -1;
+  for (auto u: read_time){
+    if(u.count()> max){
+      max = u.count();
+    }
+  }
+
+  log_file << "Max read time = " << max << " us\n";
+
+  max = -1;
+  for (auto u: write_time){
+    if(u.count()> max){
+      max = u.count();
+    }
+  }
+
+  log_file << "Max write time = " << max << " us\n";
+
 }
 
 bool AudioPlayer::execute_loop() {
@@ -62,8 +99,10 @@ bool AudioPlayer::execute_loop() {
                    (timing.elapsed_time / timing.nb_execution);
     read_us = read_us < us_t(0) ? us_t(0) : read_us;
 
-    vector<AudioData> data =
-        audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
+    vector<AudioData> data;
+    us_t real_read_us = duration_cast<us_t>(minuter([this, &data, read_us]{data = audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);}));
+
+    read_time.push_back(real_read_us);
 
     if (is_lagging) {
       sleep_for(
@@ -80,6 +119,8 @@ bool AudioPlayer::execute_loop() {
     }));
     // could use a better function
     timing.write_us /= 2;
+
+    write_time.push_back(timing_info.write_us);
 
     // data.size() is the number of char. So, nb_chars * 8 = nb_bits.
     // nb_bits / sample_rate = nb_samples

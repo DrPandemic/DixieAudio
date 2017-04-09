@@ -8,6 +8,9 @@
 #include <boost/thread.hpp>
 #include <boost/thread/concurrent_queues/sync_queue.hpp>
 #include <memory>
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 enum AudioPlayerState { playing, stopped, paused };
 enum AudioPlayerCommand {
@@ -63,9 +66,15 @@ private:
   AudioPlayerState current_state = stopped;
   bool is_lagging = false;
   bool is_dying = false;
+  std::ofstream log_file;
+  std::vector<us_t> read_time;
+  std::vector<us_t> write_time;
+  std::vector<us_t> complete_loop_time;
+  AudioPlayerTimingInfo timing_info;
   AudioPlayerTimingInfo timing;
 
   void main_loop();
+  void log_to_file();
   bool execute_command();
   bool execute_loop();
 
