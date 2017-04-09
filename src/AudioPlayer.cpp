@@ -12,35 +12,36 @@ AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
 }
 
 void AudioPlayer::init() {
-  current_sample_written = 0;
-  elapsed_time = us_t(0);
-  nb_execution = 1;
-  playing_elapsed_time = us_t(0);
-  write_us = us_t(0);
-  saved_timed_of_first_write = false;
+  timing_info.current_sample_written = 0;
+  timing_info.elapsed_time = us_t(0);
+  timing_info.nb_execution = 1;
+  timing_info.playing_elapsed_time = us_t(0);
+  timing_info.write_us = us_t(0);
+  timing_info.saved_timed_of_first_write = false;
 }
 
 void AudioPlayer::main_loop() {
   bool isAlive = true;
 
   while (isAlive) {
-    elapsed_time += duration_cast<us_t>(minuter([&isAlive, this] {
+    timing_info.elapsed_time += duration_cast<us_t>(minuter([&isAlive, this] {
       isAlive = execute_loop();
-      ++nb_execution;
+      ++timing_info.nb_execution;
     }));
 
     if (current_state == AudioPlayerState::playing) {
-      time_elapsed_since_first_write =
-          duration_cast<us_t>(system_clock::now() - time_of_first_write);
-      double sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
+      timing_info.time_elapsed_since_first_write = duration_cast<us_t>(
+          system_clock::now() - timing_info.time_of_first_write);
       auto estimated_buffer_size =
-          (current_sample_written -
-           (time_elapsed_since_first_write.count() * sample_rate_us));
-      auto wanted_buffer_size = BUFFER_US.count() * sample_rate_us;
+          (timing_info.current_sample_written -
+           (timing_info.time_elapsed_since_first_write.count() *
+            timing_info.sample_rate_us));
+      auto wanted_buffer_size = BUFFER_US.count() * timing_info.sample_rate_us;
 
       if (estimated_buffer_size > wanted_buffer_size) {
         boost::this_thread::sleep_for(
-            us_t(micro_per_loop - (elapsed_time / nb_execution)));
+            us_t(micro_per_loop -
+                 (timing_info.elapsed_time / timing_info.nb_execution)));
       }
     }
   }
@@ -54,7 +55,8 @@ bool AudioPlayer::execute_loop() {
   }
 
   if (current_state == AudioPlayerState::playing) {
-    us_t read_us = micro_per_loop - write_us - (elapsed_time / nb_execution);
+    us_t read_us = micro_per_loop - timing_info.write_us -
+                   (timing_info.elapsed_time / timing_info.nb_execution);
     read_us = read_us < us_t(0) ? us_t(0) : read_us;
 
     vector<AudioData> data =
@@ -65,19 +67,19 @@ bool AudioPlayer::execute_loop() {
           us_t(250 + (rand() % (int)(400 - 250 + 1))));
     }
 
-    write_us += duration_cast<us_t>(minuter([this, &data] {
+    timing_info.write_us += duration_cast<us_t>(minuter([this, &data] {
       device->write(data);
-      if (!saved_timed_of_first_write) {
-        time_of_first_write = system_clock::now();
-        saved_timed_of_first_write = true;
+      if (!timing_info.saved_timed_of_first_write) {
+        timing_info.time_of_first_write = system_clock::now();
+        timing_info.saved_timed_of_first_write = true;
       }
     }));
     // could use a better function
-    write_us /= 2;
+    timing_info.write_us /= 2;
 
     // data.size() is the number of char. So, nb_chars * 8 = nb_bits.
     // nb_bits / sample_rate = nb_samples
-    current_sample_written +=
+    timing_info.current_sample_written +=
         (data.size() * 8 / audio_file->get_header().get_sample_size());
 
     if (audio_file->eof()) {
@@ -92,23 +94,24 @@ bool AudioPlayer::execute_command() {
 
     switch (message.command) {
     case (AudioPlayerCommand::start):
-      elapsed_time = us_t(0);
-      current_sample_written = 0;
+      timing_info.elapsed_time = us_t(0);
+      timing_info.current_sample_written = 0;
       audio_file = std::move(message.audio_file);
       micro_per_loop = us_t(1'000'000 / (audio_file->get_header().get_rate() /
                                          MAX_SAMPLES_PER_LOOP));
-      new_rate = audio_file->get_header().get_rate();
+      timing_info.sample_rate_us =
+          audio_file->get_header().get_rate() / 1'000'000.;
       current_state = playing;
       break;
     case (AudioPlayerCommand::stop):
       if (current_state == playing) {
-        playing_elapsed_time = elapsed_time;
+        timing_info.playing_elapsed_time = timing_info.elapsed_time;
         current_state = paused;
       }
       break;
     case (AudioPlayerCommand::resume):
       if (current_state == paused) {
-        elapsed_time = playing_elapsed_time;
+        timing_info.elapsed_time = timing_info.playing_elapsed_time;
         current_state = playing;
 
         init();
@@ -134,15 +137,7 @@ bool AudioPlayer::execute_command() {
       break;
     case (AudioPlayerCommand::query_timing_info):
       Response r;
-      AudioPlayerTimingInfo t;
-      t.current_sample_written = current_sample_written;
-      t.elapsed_time = elapsed_time;
-      t.nb_execution = nb_execution;
-      t.playing_elapsed_time = playing_elapsed_time;
-      t.write_us = write_us;
-      t.time_elapsed_since_first_write = time_elapsed_since_first_write;
-      t.sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
-      r.audio_player_timing_info = t;
+      r.audio_player_timing_info = timing_info;
       response_queue.push(r);
       break;
     }
@@ -202,7 +197,7 @@ AudioPlayerTimingInfo AudioPlayer::get_timing_info() {
 
   return r.audio_player_timing_info;
 }
-void AudioPlayer::lag() {
+void AudioPlayer::toggle_lag() {
   Message message{AudioPlayerCommand::lag};
   message_queue.push(move(message));
 }

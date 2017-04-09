@@ -31,6 +31,8 @@ struct AudioPlayerTimingInfo {
   us_t write_us;
   us_t time_elapsed_since_first_write;
   double sample_rate_us;
+  time_point_t time_of_first_write;
+  bool saved_timed_of_first_write;
 };
 
 struct Message {
@@ -50,6 +52,8 @@ struct Response {
 
 class AudioPlayer {
 private:
+  static const size_t MAX_SAMPLES_PER_LOOP = 4;
+
   std::unique_ptr<AudioDevice> device;
   std::unique_ptr<AudioFile> audio_file;
   boost::sync_queue<Message> message_queue;
@@ -57,30 +61,14 @@ private:
   boost::thread main_thread;
   boost::chrono::microseconds micro_per_loop;
 
-  static const size_t MAX_SAMPLES_PER_LOOP = 4;
-
-  int current_song;
   AudioPlayerState current_state = stopped;
-  size_t new_rate = 0;
+  bool is_lagging = false;
+  bool is_dying = false;
+  AudioPlayerTimingInfo timing_info;
 
   void main_loop();
   bool execute_command();
   bool execute_loop();
-
-  size_t current_sample_written;
-  us_t elapsed_time;
-  size_t nb_execution;
-  us_t playing_elapsed_time;
-  us_t write_us;
-  us_t time_elapsed_since_first_write;
-
-  bool is_lagging = false;
-
-  // buffering
-  time_point_t time_of_first_write;
-  bool saved_timed_of_first_write;
-
-  bool is_dying = false;
 
 public:
   constexpr static const us_t BUFFER_US = us_t(10000);
@@ -95,7 +83,7 @@ public:
   void skip_to(int track_id);
   void kill();
   bool is_alive();
-  void lag();
+  void toggle_lag();
 
   AudioPlayerState get_state();
   AudioPlayerTimingInfo get_timing_info();

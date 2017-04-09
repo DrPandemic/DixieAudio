@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
           player.kill();
           break;
         case 'l':
-          player.lag();
+          player.toggle_lag();
           break;
         default:
           cout << endl << endl;
