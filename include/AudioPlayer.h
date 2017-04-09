@@ -20,7 +20,7 @@ enum AudioPlayerCommand {
   kill_thread,
   query_state,
   query_timing_info,
-  downsample
+  lag
 };
 
 struct AudioPlayerTimingInfo {
@@ -29,7 +29,6 @@ struct AudioPlayerTimingInfo {
   size_t nb_execution;
   us_t playing_elapsed_time;
   us_t write_us;
-  us_t resample_us;
   us_t time_elapsed_since_first_write;
   double sample_rate_us;
 };
@@ -62,7 +61,6 @@ private:
 
   int current_song;
   AudioPlayerState current_state = stopped;
-  bool resample = false;
   size_t new_rate = 0;
 
   void main_loop();
@@ -74,8 +72,9 @@ private:
   size_t nb_execution;
   us_t playing_elapsed_time;
   us_t write_us;
-  us_t resample_us;
   us_t time_elapsed_since_first_write;
+
+  bool is_lagging = false;
 
   // buffering
   time_point_t time_of_first_write;
@@ -96,8 +95,7 @@ public:
   void skip_to(int track_id);
   void kill();
   bool is_alive();
-  void downsample();
-  std::vector<AudioData> resample_data(std::vector<AudioData>);
+  void lag();
 
   AudioPlayerState get_state();
   AudioPlayerTimingInfo get_timing_info();

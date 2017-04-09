@@ -20,7 +20,7 @@ void display_ui(const WAVHeader &header) {
   cout << "   s: start" << endl;
   cout << "   p: pause" << endl;
   cout << "   x: stop" << endl;
-  cout << "   d: downsample" << endl << endl;
+  cout << "   l: add random lag" << endl << endl;
   cout << "File Information:" << endl;
   cout << "Number of channels: " << header.number_of_channels << endl;
   cout << "Sample rate: " << header.sample_rate << " Hz" << endl;
@@ -63,15 +63,16 @@ int main(int argc, char *argv[]) {
         case 'x':
           player.kill();
           break;
-        case 'd':
-          player.downsample();
+        case 'l':
+          player.lag();
           break;
         default:
-          cout << "\n"
-               << "Valid commands are : " << endl;
+          cout << endl << endl;
+          cout << "Valid commands are : " << endl;
           cout << "p : pause" << endl;
           cout << "s : resume" << endl;
           cout << "x : stop" << endl;
+          cout << "l : lag" << endl;
           break;
         }
       }
