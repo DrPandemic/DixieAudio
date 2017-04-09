@@ -3,8 +3,14 @@
 
 using namespace std;
 using namespace boost::chrono;
+using namespace boost::this_thread;
 
 constexpr const us_t AudioPlayer::BUFFER_US;
+
+namespace {
+const int MIN_ARTIFICIAL_LAG = 250;
+const int MAX_ARTIFICIAL_LAG = 400;
+}
 
 AudioPlayer::AudioPlayer(unique_ptr<AudioDevice> device)
     : device{move(device)}, main_thread{&AudioPlayer::main_loop, this} {
@@ -39,17 +45,15 @@ void AudioPlayer::main_loop() {
       auto wanted_buffer_size = BUFFER_US.count() * timing.sample_rate_us;
 
       if (estimated_buffer_size > wanted_buffer_size) {
-        boost::this_thread::sleep_for(us_t(
-            timing.us_per_loop - (timing.elapsed_time / timing.nb_execution)));
+        sleep_for(us_t(timing.us_per_loop -
+                       (timing.elapsed_time / timing.nb_execution)));
       }
     }
   }
 }
 
 bool AudioPlayer::execute_loop() {
-  bool playerIsAlive = execute_command();
-
-  if (!playerIsAlive) {
+  if (!execute_command()) {
     return false;
   }
 
@@ -62,8 +66,9 @@ bool AudioPlayer::execute_loop() {
         audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
 
     if (is_lagging) {
-      boost::this_thread::sleep_for(
-          us_t(250 + (rand() % (int)(400 - 250 + 1))));
+      sleep_for(
+          us_t(::MIN_ARTIFICIAL_LAG +
+               (rand() % (int)(::MAX_ARTIFICIAL_LAG - ::MIN_ARTIFICIAL_LAG))));
     }
 
     timing.write_us += duration_cast<us_t>(minuter([this, &data] {
@@ -85,7 +90,7 @@ bool AudioPlayer::execute_loop() {
       audio_file->restart();
     }
   }
-  return playerIsAlive;
+  return true;
 }
 bool AudioPlayer::execute_command() {
   if (!message_queue.empty()) {
