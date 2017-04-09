@@ -38,17 +38,9 @@ void AudioPlayer::main_loop() {
            (time_elapsed_since_first_write.count() * sample_rate_us));
       auto wanted_buffer_size = BUFFER_US.count() * sample_rate_us;
 
-      // cout << "current sample written " << current_sample_written << endl;
-      // cout << "estimated sample played "
-      //     << time_elapsed_since_first_write.count() * sample_rate_us << endl;
-      // cout << "estimated buffered " << estimated_buffer_size << endl;
-      // cout << "wanted buffer size " << wanted_buffer_size << endl;
-
       if (estimated_buffer_size > wanted_buffer_size) {
         boost::this_thread::sleep_for(
             us_t(micro_per_loop - (elapsed_time / nb_execution)));
-      } else {
-        // cout << "Buffering..." << endl;
       }
     }
   }
@@ -64,12 +56,6 @@ bool AudioPlayer::execute_loop() {
   if (current_state == AudioPlayerState::playing) {
     us_t read_us = micro_per_loop - write_us - (elapsed_time / nb_execution);
     read_us = read_us < us_t(0) ? us_t(0) : read_us;
-
-    // cout << "loop allowed us " << micro_per_loop.count() << endl;
-    // cout << "read allowed us " << read_us.count() << endl;
-    // cout << "write us " << write_us.count() << endl;
-    // cout << "loop us " << (elapsed_time / nb_execution).count() << endl;
-    // cout << endl;
 
     vector<AudioData> data =
         audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
