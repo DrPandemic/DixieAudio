@@ -1,10 +1,10 @@
 #include "WAVFile.cpp"
 #include "gtest/gtest.h"
+#include <boost/chrono.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdio.h>
 #include <vector>
-#include <boost/chrono.hpp>
 
 TEST(reader_test, get_header) {
 
@@ -65,11 +65,10 @@ TEST(reader_test, is_valid) {
 TEST(reader_test, read) {
 
   unsigned char valid_data[] = {
-      0x52, 0x49, 0x46, 0x46, 0xC0, 0x27, 0x01, 0x00, 0x57, 0x41, 0x56,
-      0x45, 0x66, 0x6D, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00,
-      0x01, 0x00, 0x11, 0x2B, 0x00, 0x00, 0x22, 0x56, 0x00, 0x00, 0x02,
-      0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00,
-      0x01,0x65,0x03,0x04};
+      0x52, 0x49, 0x46, 0x46, 0xC0, 0x27, 0x01, 0x00, 0x57, 0x41, 0x56, 0x45,
+      0x66, 0x6D, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+      0x11, 0x2B, 0x00, 0x00, 0x22, 0x56, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
+      0x64, 0x61, 0x74, 0x61, 0x9C, 0x27, 0x01, 0x00, 0x01, 0x65, 0x03, 0x04};
 
   auto ss_v =
       make_unique<stringstream>(std::stringstream::in | std::stringstream::out);
@@ -108,22 +107,19 @@ TEST(reader_test, read_while) {
   vector<AudioData> data = marioWAV_v.read_while(4, us_t(200));
   auto after = boost::chrono::system_clock::now();
 
-  EXPECT_EQ(data.size(), 4 * (header.bits_per_sample / (sizeof(AudioData) * 8)));
+  EXPECT_EQ(data.size(),
+            4 * (header.bits_per_sample / (sizeof(AudioData) * 8)));
   EXPECT_EQ(data[0], 1);
   EXPECT_EQ(data[1], 101);
   EXPECT_EQ(data[2], 3);
   EXPECT_EQ(data[3], 4);
-  EXPECT_LE(boost::chrono::duration_cast<us_t>(after-before), us_t(200));
+  EXPECT_LE(boost::chrono::duration_cast<us_t>(after - before), us_t(200));
 
   before = boost::chrono::system_clock::now();
   data = marioWAV_v.read_while(4, us_t(70), true);
   after = boost::chrono::system_clock::now();
 
-  cout << boost::chrono::duration_cast<us_t>(after-before) << endl;
-  cout << us_t(header.bits_per_sample/8*30)<<endl;
-
   EXPECT_LE(data.size(), 4);
-  EXPECT_LE(boost::chrono::duration_cast<us_t>(after-before), us_t(70) + us_t(header.bits_per_sample/8*30));
+  EXPECT_LE(boost::chrono::duration_cast<us_t>(after - before),
+            us_t(70) + us_t(header.bits_per_sample / 8 * 30));
 }
-
-

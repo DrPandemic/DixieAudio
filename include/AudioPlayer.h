@@ -16,7 +16,6 @@ enum AudioPlayerCommand {
   resume,
   next,
   previous,
-  skip_to,
   kill_thread,
   query_state,
   query_timing_info,
@@ -33,20 +32,21 @@ struct AudioPlayerTimingInfo {
   double sample_rate_us;
   time_point_t time_of_first_write;
   bool saved_timed_of_first_write;
+  us_t us_per_loop;
 };
 
 struct Message {
   AudioPlayerCommand command;
   std::unique_ptr<AudioFile> audio_file;
-  int skip_to_track_id;
   Message(AudioPlayerCommand c) : command{c} {};
   Message(){};
 };
 
 struct Response {
-  AudioPlayerTimingInfo audio_player_timing_info;
+  AudioPlayerTimingInfo timing_info;
   AudioPlayerState state;
   Response(AudioPlayerState s) : state{s} {};
+  Response(AudioPlayerTimingInfo t) : timing_info{t} {};
   Response(){};
 };
 
@@ -59,12 +59,11 @@ private:
   boost::sync_queue<Message> message_queue;
   boost::sync_queue<Response> response_queue;
   boost::thread main_thread;
-  boost::chrono::microseconds micro_per_loop;
 
   AudioPlayerState current_state = stopped;
   bool is_lagging = false;
   bool is_dying = false;
-  AudioPlayerTimingInfo timing_info;
+  AudioPlayerTimingInfo timing;
 
   void main_loop();
   bool execute_command();
@@ -80,7 +79,6 @@ public:
   void resume();
   void next();
   void previous();
-  void skip_to(int track_id);
   void kill();
   bool is_alive();
   void toggle_lag();
