@@ -49,8 +49,15 @@ void AudioPlayer::main_loop() {
       auto wanted_buffer_size = BUFFER_US.count() * timing.sample_rate_us;
 
       if (estimated_buffer_size > wanted_buffer_size) {
+        //sleep_time.push_back(us_t(timing.us_per_loop -
+        //                         (timing.elapsed_time / timing.nb_execution)));
+        auto bef  = system_clock::now();
         sleep_for(us_t(timing.us_per_loop -
                        (timing.elapsed_time / timing.nb_execution)));
+        auto after = system_clock::now();
+        sleep_time.push_back(duration_cast<us_t>(after-bef) - us_t(timing.us_per_loop -
+                                                                    (timing.elapsed_time / timing.nb_execution)));
+
       }
     }
   }
@@ -81,9 +88,17 @@ void AudioPlayer::log_to_file() {
     }
   }
 
+  int max_sleep = -1;
+  for (auto u: sleep_time){
+    if(abs(u.count())> max_sleep){
+      max_sleep = abs(u.count());
+    }
+  }
+
   log_file << "Max read time = " << max_read << " us\n";
-  log_file << "Max loop time = " << max_total << " us\n";
   log_file << "Max write time = " << max_write << " us\n";
+  log_file << "Max sleep time = " << max_sleep << " us\n";
+  log_file << "Max loop time = " << max_total << " us\n";
 
 }
 
