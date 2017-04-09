@@ -1,4 +1,5 @@
 #include "../include/WAVFile.h"
+#include <boost/thread.hpp>
 
 using namespace std;
 using namespace boost::chrono;
@@ -45,7 +46,7 @@ vector<AudioData> WAVFile::read(size_t nb_bytes) {
   return data;
 }
 
-vector<AudioData> WAVFile::read_while(size_t nb_samples, us_t max_micro) {
+vector<AudioData> WAVFile::read_while(size_t nb_samples, us_t max_micro, bool add_lag) {
   auto start = system_clock::now();
   vector<AudioData> data;
   int amount = header.bits_per_sample / (sizeof(AudioData) * 8);
@@ -56,20 +57,13 @@ vector<AudioData> WAVFile::read_while(size_t nb_samples, us_t max_micro) {
        duration_cast<us_t>(system_clock::now() - start) < max_micro;
        ++i) {
     for (int j = 0; j < amount && file_stream->good(); ++j) {
+      if(add_lag) {
+        boost::this_thread::sleep_for(
+            us_t(30));
+      }
       file_stream->read(&tmp, 1);
       data.push_back(tmp);
     }
-  }
-
-  return data;
-}
-
-vector<AudioData> WAVFile::read_all() {
-  vector<AudioData> data;
-  char tmp;
-  while (file_stream->good()) {
-    file_stream->read(&tmp, 1);
-    data.push_back(tmp);
   }
 
   return data;

@@ -29,8 +29,7 @@ public:
       : file_stream{std::move(file_stream)} {};
   virtual std::vector<AudioData> read(size_t nb_bytes) = 0;
   virtual std::vector<AudioData> read_while(size_t nb_samples,
-                                            us_t max_duration) = 0;
-  virtual std::vector<AudioData> read_all() = 0;
+                                            us_t max_duration, bool add_lag = false) = 0;
   virtual const AudioHeader &get_header() const = 0;
   virtual ~AudioFile(){};
   bool is_valid() const { return get_header().is_valid(); }
