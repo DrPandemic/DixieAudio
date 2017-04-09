@@ -1,4 +1,5 @@
 #include "../include/AudioPlayer.h"
+#include <random>
 
 using namespace std;
 using namespace boost::chrono;
@@ -16,7 +17,6 @@ void AudioPlayer::init() {
   nb_execution = 1;
   playing_elapsed_time = us_t(0);
   write_us = us_t(0);
-  resample_us = us_t(0);
   saved_timed_of_first_write = false;
 }
 
@@ -62,14 +62,11 @@ bool AudioPlayer::execute_loop() {
   }
 
   if (current_state == AudioPlayerState::playing) {
-    // this need to be changed
-    us_t read_us =
-        micro_per_loop - resample_us - write_us - (elapsed_time / nb_execution);
+    us_t read_us = micro_per_loop - write_us - (elapsed_time / nb_execution);
     read_us = read_us < us_t(0) ? us_t(0) : read_us;
 
     // cout << "loop allowed us " << micro_per_loop.count() << endl;
     // cout << "read allowed us " << read_us.count() << endl;
-    // cout << "resample us " << resample_us.count() << endl;
     // cout << "write us " << write_us.count() << endl;
     // cout << "loop us " << (elapsed_time / nb_execution).count() << endl;
     // cout << endl;
@@ -77,13 +74,9 @@ bool AudioPlayer::execute_loop() {
     vector<AudioData> data =
         audio_file->read_while(AudioPlayer::MAX_SAMPLES_PER_LOOP, read_us);
 
-    if (resample) {
-      resample_us += duration_cast<us_t>(minuter([this, &data] {
-        cout << "before" << data[0] << endl;
-        data = resample_data(data);
-        cout << "after" << data[0] << endl;
-      }));
-      resample_us /= 2;
+    if (is_lagging) {
+      boost::this_thread::sleep_for(
+          us_t(250 + (rand() % (int)(400 - 250 + 1))));
     }
 
     write_us += duration_cast<us_t>(minuter([this, &data] {
@@ -144,27 +137,22 @@ bool AudioPlayer::execute_command() {
     case (AudioPlayerCommand::skip_to):
       current_state = playing;
       break;
-    case (AudioPlayerCommand::downsample):
-      resample = true;
-      new_rate = new_rate / 2;
-      // TODO
-      break;
     case (AudioPlayerCommand::kill_thread):
       return false;
       break;
     case (AudioPlayerCommand::query_state):
       response_queue.push(Response{current_state});
       break;
+    case (AudioPlayerCommand::lag):
+      is_lagging = !is_lagging;
+      break;
     case (AudioPlayerCommand::query_timing_info):
       Response r;
       AudioPlayerTimingInfo t;
-      cout << "yeh" << endl;
-      cout << current_sample_written << endl;
       t.current_sample_written = current_sample_written;
       t.elapsed_time = elapsed_time;
       t.nb_execution = nb_execution;
       t.playing_elapsed_time = playing_elapsed_time;
-      t.resample_us = resample_us;
       t.write_us = write_us;
       t.time_elapsed_since_first_write = time_elapsed_since_first_write;
       t.sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
@@ -210,12 +198,6 @@ void AudioPlayer::kill() {
   main_thread.join();
   is_dying = true;
 }
-void AudioPlayer::downsample() {
-  Message message{AudioPlayerCommand::downsample};
-  message_queue.push(move(message));
-  // TODO
-  return;
-}
 AudioPlayerState AudioPlayer::get_state() {
   Message message{AudioPlayerCommand::query_state};
   message_queue.push(move(message));
@@ -234,36 +216,9 @@ AudioPlayerTimingInfo AudioPlayer::get_timing_info() {
 
   return r.audio_player_timing_info;
 }
+void AudioPlayer::lag() {
+  Message message{AudioPlayerCommand::lag};
+  message_queue.push(move(message));
+}
 
 bool AudioPlayer::is_alive() { return !is_dying; }
-
-std::vector<AudioData> AudioPlayer::resample_data(std::vector<AudioData> data) {
-  char first_number[] = {0, 0};
-  char second_number[] = {0, 0};
-  int value;
-  std::vector<AudioData> newData;
-  newData.resize(4);
-
-  for (int i = 0; i < newData.size() / 2; i++) {
-    first_number[i] = data[i * 4];
-    first_number[i + 1] = data[i * 4 + 1];
-    second_number[i] = data[i * 4 + 2];
-    second_number[i + 1] = data[i * 4 + 3];
-
-    uint16_t f_num = *((int *)first_number);
-    uint16_t s_num = *((int *)second_number);
-    cout << "f_num " << endl;
-    cout << f_num << endl;
-    cout << "s_num " << endl;
-    cout << s_num << endl;
-
-    uint16_t interp = (f_num + s_num) / 2;
-
-    // TODO figure how to retrieve two char from this int representation.
-
-    // newData[i*2] = c[0];
-    // newData[i*2 + 1] = c[1];
-    // cout << newData[i] << endl;
-  }
-  return newData;
-}
