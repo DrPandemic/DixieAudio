@@ -1,5 +1,4 @@
 #include "../include/AudioPlayer.h"
-#include <algorithm>
 
 using namespace std;
 using namespace boost::chrono;
@@ -31,16 +30,17 @@ void AudioPlayer::main_loop() {
     }));
 
     if (current_state == AudioPlayerState::playing) {
-      us_t real_elapsed =
+      time_elapsed_since_first_write =
           duration_cast<us_t>(system_clock::now() - time_of_first_write);
       double sample_rate_us = audio_file->get_header().get_rate() / 1'000'000.;
       auto estimated_buffer_size =
-          (current_sample_written - (real_elapsed.count() * sample_rate_us));
+          (current_sample_written -
+           (time_elapsed_since_first_write.count() * sample_rate_us));
       auto wanted_buffer_size = BUFFER_US.count() * sample_rate_us;
 
       // cout << "current sample written " << current_sample_written << endl;
       // cout << "estimated sample played "
-      //     << real_elapsed.count() * sample_rate_us << endl;
+      //     << time_elapsed_since_first_write.count() * sample_rate_us << endl;
       // cout << "estimated buffered " << estimated_buffer_size << endl;
       // cout << "wanted buffer size " << wanted_buffer_size << endl;
 
@@ -155,6 +155,20 @@ bool AudioPlayer::execute_command() {
     case (AudioPlayerCommand::query_state):
       response_queue.push(Response{current_state});
       break;
+    case (AudioPlayerCommand::query_timing_info):
+      Response r;
+      AudioPlayerTimingInfo t;
+      t.current_sample_written = current_sample_written;
+      t.elapsed_time = elapsed_time;
+      t.nb_execution = nb_execution;
+      t.playing_elapsed_time = playing_elapsed_time;
+      t.resample_us = resample_us;
+      t.write_us = write_us;
+      t.time_elapsed_since_first_write = time_elapsed_since_first_write;
+      t.sample_rate_us =  audio_file->get_header().get_rate() / 1'000'000.;
+      r.audio_player_timing_info = t;
+      response_queue.push(r);
+      break;
     }
   }
 
@@ -208,6 +222,15 @@ AudioPlayerState AudioPlayer::get_state() {
   response_queue.wait_pull(r);
 
   return r.state;
+}
+AudioPlayerTimingInfo AudioPlayer::get_timing_info() {
+  Message message{AudioPlayerCommand::query_timing_info};
+  message_queue.push(move(message));
+
+  Response r;
+  response_queue.wait_pull(r);
+
+  return r.audio_player_timing_info;
 }
 
 bool AudioPlayer::is_alive() { return !is_dying; }

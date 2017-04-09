@@ -19,7 +19,19 @@ enum AudioPlayerCommand {
   skip_to,
   kill_thread,
   query_state,
+  query_timing_info,
   downsample
+};
+
+struct AudioPlayerTimingInfo {
+  size_t current_sample_written;
+  us_t elapsed_time;
+  size_t nb_execution;
+  us_t playing_elapsed_time;
+  us_t write_us;
+  us_t resample_us;
+  us_t time_elapsed_since_first_write;
+  double sample_rate_us;
 };
 
 struct Message {
@@ -31,6 +43,7 @@ struct Message {
 };
 
 struct Response {
+  AudioPlayerTimingInfo audio_player_timing_info;
   AudioPlayerState state;
   Response(AudioPlayerState s) : state{s} {};
   Response(){};
@@ -62,6 +75,7 @@ private:
   us_t playing_elapsed_time;
   us_t write_us;
   us_t resample_us;
+  us_t time_elapsed_since_first_write;
 
   // buffering
   time_point_t time_of_first_write;
@@ -85,6 +99,7 @@ public:
   std::vector<AudioData> resample_data(std::vector<AudioData>);
 
   AudioPlayerState get_state();
+  AudioPlayerTimingInfo get_timing_info();
 };
 
 #endif // DIXIEAUDIO_AUDIO_PLAYER_H

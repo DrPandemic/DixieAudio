@@ -4,6 +4,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <memory>
+#include <cstdlib>
 
 using namespace std;
 using namespace ::testing;
@@ -55,6 +56,29 @@ TEST(player_test, can_resume) {
   ASSERT_EQ(player.get_state(), AudioPlayerState::paused);
   player.resume();
   ASSERT_EQ(player.get_state(), AudioPlayerState::playing);
+
+  player.kill();
+}
+
+
+TEST(player_test, timing) {
+  auto device_ptr = new StrictMock<MockAudioDevice>{};
+  EXPECT_CALL(*device_ptr, reset_device(_)).WillOnce(Return());
+  EXPECT_CALL(*device_ptr, write(_)).WillRepeatedly(Return(1));
+  auto device = unique_ptr<StrictMock<MockAudioDevice>>(device_ptr);
+  AudioPlayer player{move(device)};
+  auto file = get_file();
+
+  player.start(std::move(file));
+  ::sleep(2);
+  AudioPlayerTimingInfo t = player.get_timing_info();
+  auto sample_played_estimation = t.time_elapsed_since_first_write.count() * t.sample_rate_us;
+
+  auto diff = abs(sample_played_estimation - t.current_sample_written);
+cout << sample_played_estimation << endl;
+  cout << t.current_sample_written << endl;
+    cout << diff << endl;
+  ASSERT_LE(3, 4);
 
   player.kill();
 }

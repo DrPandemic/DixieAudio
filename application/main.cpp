@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// This is reallllllly not portable. I guess pulse is also not portable...
+// This is not portable. I guess pulse is also not portable...
 void stop_buffering() {
   struct termios t;
   tcgetattr(STDIN_FILENO, &t);
@@ -24,7 +24,6 @@ void display_ui(const WAVHeader &header) {
   cout << "File Information:" << endl;
   cout << "Number of channels: " << header.number_of_channels << endl;
   cout << "Sample rate: " << header.sample_rate << " Hz" << endl;
-  cout << "Bits per sample: " << header.bits_per_sample << " bits" << endl;
   cout << "Data size: " << header.data_size << " bytes" << endl;
 }
 
@@ -44,7 +43,7 @@ int main(int argc, char *argv[]) {
     auto header = f->get_header();
 
     // only supporting 16 bits for now
-    if (header.bits_per_sample == 16) {
+    if (header.is_valid()) {
       AudioPlayer player{move(device)};
       player.start(std::move(f));
 
